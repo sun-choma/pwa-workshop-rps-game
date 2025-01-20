@@ -1,0 +1,22 @@
+.card-desk {
+    position: relative;
+    width: 100%;
+
+    display: flex;
+}
+
+.card-desk:first-of-type {
+    flex-direction: column;
+}
+
+.card-desk:last-of-type {
+    flex-direction: column-reverse;
+}
+
+.card-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 120px));
+    gap: 0.5rem;
+    justify-content: center;
+}
