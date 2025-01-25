@@ -1,11 +1,10 @@
 import { motion } from "motion/react";
 
-import { joinClassNames, nodeArray } from "@/utils";
 import { GameCard } from "@/components/game-card";
-import { CARD_ATTRIBUTE } from "@/constants";
 import { Desk } from "@/components/desk";
 import { useGame } from "@/providers/game/useGame";
-import { GAME_PHASES } from "@/providers/game/types";
+import { joinClassNames, nodeArray } from "@/utils/common.ts";
+import { CARD_ATTRIBUTE, GAME_PHASES } from "@/core/game/constants.ts";
 
 export function OpponentDesk() {
   const { opponent, game } = useGame();
@@ -13,7 +12,7 @@ export function OpponentDesk() {
   const isTurnPhase = game.phase === GAME_PHASES.PLAYERS_TURN;
 
   return (
-    <Desk title="CPU Desk" lives={opponent.lives}>
+    <Desk title={opponent.name} lives={opponent.lives}>
       {isTurnPhase ? (
         <motion.div
           key="turn"

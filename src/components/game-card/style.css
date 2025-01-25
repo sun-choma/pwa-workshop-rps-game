@@ -33,8 +33,8 @@
     height: 100%;
     backface-visibility: hidden;
 
-    background: #111;
-    border: 1px solid #444;
+    background: var(--chakra-colors-bg-subtle);
+    border: 1px solid var(--chakra-colors-border-emphasized);
 
     border-radius: inherit;
     overflow: hidden;
@@ -58,7 +58,7 @@ button:hover:not(:disabled) > .card-container:not(.selected) .card {
 }
 
 .card-container.selected .card {
-    outline: 1px solid white;
+    outline: 1px solid var(--chakra-colors-border-inverted);
     transform: translateY(20%) rotateY(180deg);
 }
 

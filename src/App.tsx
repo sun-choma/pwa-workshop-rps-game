@@ -1,8 +1,8 @@
 // import { Game } from "@/pages/game";
 import { useGame } from "@/providers/game/useGame.ts";
-import { GAME_PHASES } from "@/providers/game/types.ts";
 import { Menu } from "@/pages/menu";
 import { Playground } from "@/pages/playground";
+import { GAME_PHASES } from "@/core/game/constants.ts";
 
 // import { Heading, HStack, Image, Text, VStack } from "@chakra-ui/react";
 
@@ -57,9 +57,7 @@ function App() {
   return (
     <>
       {phase === GAME_PHASES.INIT && <Menu />}
-      {![GAME_PHASES.INIT, GAME_PHASES.GAME_RESULTS].includes(phase) && (
-        <Playground />
-      )}
+      {phase !== GAME_PHASES.INIT && <Playground />}
     </>
   );
   // return <Game />;

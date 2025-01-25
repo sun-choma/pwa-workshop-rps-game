@@ -1,17 +1,9 @@
-import { CARD_ATTRIBUTE, OUTCOME } from "@/constants.ts";
-
-export enum GAME_PHASES {
-  INIT,
-  MATCHING,
-  PLAYERS_TURN,
-  TURN_RESULTS,
-  GAME_RESULTS,
-}
+import { CARD_ATTRIBUTE, GAME_PHASES, OUTCOME } from "@/core/game/constants.ts";
 
 interface Player {
   name: string;
   lives: number;
-  card: CARD_ATTRIBUTE | undefined;
+  card: CARD_ATTRIBUTE | null | undefined;
   selectedCardIndex?: number | null;
   hoveredCardIndex?: number | null;
   isReady?: boolean;
@@ -25,6 +17,8 @@ export interface GameContext {
   };
   player: Player;
   opponent: Player;
-  startMatchmaking: (playerName: string) => void;
+  startGame: (playerName: string) => void;
   selectCard: (attr: CARD_ATTRIBUTE) => void;
+  rematch: () => void;
+  returnToMenu: () => void;
 }

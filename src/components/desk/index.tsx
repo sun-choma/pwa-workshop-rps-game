@@ -4,10 +4,10 @@ import { HStack, Text, VStack } from "@chakra-ui/react";
 import { HeartIcon, HeartOffIcon } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 
-import { nodeArray } from "@/utils.ts";
 import { MAX_LIVES } from "@/providers/game/constants.ts";
 
 import "./styles.css";
+import { nodeArray } from "@/utils/common.ts";
 
 interface DeskProps {
   title: string;

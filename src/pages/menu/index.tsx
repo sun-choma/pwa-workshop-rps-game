@@ -8,7 +8,7 @@ import { useGame } from "@/providers/game/useGame.ts";
 
 export function Menu() {
   const [username, setUsername] = useState("");
-  const { startMatchmaking } = useGame();
+  const { startGame } = useGame();
 
   return (
     <VStack gap="4" maxW="300px">
@@ -22,7 +22,7 @@ export function Menu() {
       </Field>
       <Button
         disabled={username.length === 0}
-        onClick={() => startMatchmaking(username)}
+        onClick={() => startGame(username)}
       >
         Single Player
       </Button>

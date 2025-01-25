@@ -7,9 +7,11 @@ import { OpponentDesk } from "@/components/opponent-desk";
 export function Playground() {
   return (
     <VStack h="full" w="full" justifyContent="space-between">
-      <OpponentDesk />
-      <Status />
-      <PlayerDesk />
+      <>
+        <OpponentDesk />
+        <Status />
+        <PlayerDesk />
+      </>
     </VStack>
   );
 }

@@ -1,8 +1,8 @@
 import { createContext } from "react";
 
-import { GAME_PHASES, GameContext } from "@/providers/game/types";
+import { GameContext } from "@/providers/game/types";
 import { MAX_LIVES, TURN_TIME } from "@/providers/game/constants";
-import { CARD_ATTRIBUTE, OUTCOME } from "@/constants.ts";
+import { CARD_ATTRIBUTE, GAME_PHASES, OUTCOME } from "@/core/game/constants.ts";
 
 export const Context = createContext<GameContext>({
   game: {
@@ -24,4 +24,6 @@ export const Context = createContext<GameContext>({
   },
   startGame: () => {},
   selectCard: () => {},
+  rematch: () => {},
+  returnToMenu: () => {},
 });

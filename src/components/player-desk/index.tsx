@@ -6,9 +6,8 @@ import { motion } from "motion/react";
 import { GameCard } from "@/components/game-card";
 import { useGame } from "@/providers/game/useGame";
 import { Button } from "@/components/ui/button";
-import { GAME_PHASES } from "@/providers/game/types";
-import { CARD_ATTRIBUTE } from "@/constants";
 import { Desk } from "@/components/desk";
+import { CARD_ATTRIBUTE, GAME_PHASES } from "@/core/game/constants.ts";
 
 const PLAYER_CARDS = [
   CARD_ATTRIBUTE.ROCK,
