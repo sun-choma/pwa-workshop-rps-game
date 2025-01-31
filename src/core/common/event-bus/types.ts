@@ -1,12 +1,13 @@
-export type Event<EventMap extends ValidEventMap<EventMap>> = keyof EventMap;
+export type Event<EventMap extends { [Key in keyof EventMap]: EventMap[Key] }> =
+  keyof EventMap;
 
 export type Callback<
-  EventMap extends ValidEventMap<EventMap>,
+  EventMap extends { [Key in keyof EventMap]: EventMap[Key] },
   Ev extends Event<EventMap>,
 > = (...payload: EventMap[Ev]) => void;
 
 export type FnArgs<
-  EventMap extends ValidEventMap<EventMap>,
+  EventMap extends { [Key in keyof EventMap]: EventMap[Key] },
   Ev extends Event<EventMap>,
 > = EventMap[Ev] extends null ? [Ev] : [event: Ev, ...payload: EventMap[Ev]];
 
@@ -21,3 +22,14 @@ type IsArrayOrNull<Type> = Type extends unknown[]
   : Type extends null
     ? Type
     : never;
+
+export type MergedMaps<
+  FirstMap extends ValidEventMap<FirstMap>,
+  SecondsMap extends ValidEventMap<SecondsMap>,
+> = {
+  [Key in keyof FirstMap | keyof SecondsMap]: Key extends keyof FirstMap
+    ? FirstMap[Key]
+    : Key extends keyof SecondsMap
+      ? SecondsMap[Key]
+      : never;
+};

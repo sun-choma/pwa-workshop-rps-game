@@ -19,6 +19,7 @@ export const INITIAL_STATE: Eventful.State<GameStateConfig> = {
   playerName: "",
   playerLives: MAX_LIVES,
   playerCard: null,
+  playerRematchDecision: null,
 
   opponentName: "",
   opponentLives: MAX_LIVES,
@@ -26,6 +27,7 @@ export const INITIAL_STATE: Eventful.State<GameStateConfig> = {
   opponentHoveredIndex: null,
   opponentSelectedIndex: null,
   opponentReady: false,
+  opponentRematchDecision: null,
 };
 
 export const FIELD_DISPATCH_MAP: Record<
@@ -39,6 +41,7 @@ export const FIELD_DISPATCH_MAP: Record<
   playerName: "player-name-set",
   playerCard: "player-card-change",
   playerLives: "player-lives-change",
+  playerRematchDecision: "player-rematch-set",
 
   opponentName: "opponent-name-set",
   opponentLives: "opponent-lives-change",
@@ -46,4 +49,5 @@ export const FIELD_DISPATCH_MAP: Record<
   opponentSelectedIndex: "opponent-selection-change",
   opponentCard: "opponent-card-change",
   opponentReady: "opponent-ready-change",
+  opponentRematchDecision: "opponent-rematch-set",
 };

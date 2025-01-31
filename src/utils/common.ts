@@ -70,3 +70,34 @@ export function entries<Object extends object>(
     ([key, value]) => [key, value] as unknown as TupleArray<Object>[number],
   );
 }
+
+export function shuffle<Item>(array: Item[]): Item[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+  }
+  return array;
+}
+
+export function getRandomEmoji() {
+  const [start, end] = [0x1f600, 0x1f64f];
+  const randomCodePoint = Math.floor(Math.random() * (end - start + 1)) + start;
+  return String.fromCodePoint(randomCodePoint);
+}
+
+// function debounce<Func extends (...args: unknown[]) => void>(
+//   func: Func,
+//   delay: number,
+// ): (...args: Parameters<Func>) => void {
+//   let timeout: ReturnType<typeof requestTimeout> | undefined;
+//
+//   return function (...args: Parameters<Func>) {
+//     if (timeout?.animationFrameId) {
+//       cancelTimeout(timeout);
+//     }
+//
+//     timeout = requestTimeout(() => {
+//       func(...args);
+//     }, delay);
+//   };
+// }

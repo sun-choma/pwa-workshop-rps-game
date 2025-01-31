@@ -14,7 +14,6 @@ export const enum Outcome {
 
 export const enum RematchDecision {
   REMATCH,
-  FIND_NEW_OPPONENT,
   MAIN_MENU,
 }
 
@@ -73,6 +72,14 @@ export interface GameStateConfig {
   turnOutcome: {
     triggers: "outcome";
     type: Outcome;
+  };
+  playerRematchDecision: {
+    triggers: "player-rematch-set";
+    type: RematchDecision | null;
+  };
+  opponentRematchDecision: {
+    triggers: "opponent-rematch-set";
+    type: RematchDecision | null;
   };
 }
 

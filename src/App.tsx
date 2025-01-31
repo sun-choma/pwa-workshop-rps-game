@@ -16,10 +16,14 @@ import { GAME_PHASES } from "@/core/game/constants.ts";
 // import pwaLogo from "/pwa-logo.svg";
 // import { usePwa } from "@/hooks/usePwa.ts";
 
+const MENU_PHASES = [GAME_PHASES.INIT, GAME_PHASES.MATCHING];
+
 function App() {
   const {
     game: { phase },
   } = useGame();
+  const isMenuPhase = MENU_PHASES.includes(phase);
+
   // const { isInstallable } = useInstallable();
   // const { isInstalled } = usePwa();
 
@@ -56,8 +60,8 @@ function App() {
   // );
   return (
     <>
-      {phase === GAME_PHASES.INIT && <Menu />}
-      {phase !== GAME_PHASES.INIT && <Playground />}
+      {isMenuPhase && <Menu />}
+      {!isMenuPhase && <Playground />}
     </>
   );
   // return <Game />;

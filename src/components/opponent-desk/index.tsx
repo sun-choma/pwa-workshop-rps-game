@@ -20,10 +20,6 @@ export function OpponentDesk() {
           initial={{ opacity: 0, y: -200 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -300 }}
-          transition={{
-            ease: "easeOut",
-            duration: 0.4,
-          }}
         >
           {nodeArray({
             length: 3,

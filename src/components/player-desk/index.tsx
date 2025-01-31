@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { VStack } from "@chakra-ui/react";
 import { motion } from "motion/react";
@@ -8,6 +8,7 @@ import { useGame } from "@/providers/game/useGame";
 import { Button } from "@/components/ui/button";
 import { Desk } from "@/components/desk";
 import { CARD_ATTRIBUTE, GAME_PHASES } from "@/core/game/constants.ts";
+import { shuffle } from "@/utils/common";
 
 const PLAYER_CARDS = [
   CARD_ATTRIBUTE.ROCK,
@@ -15,24 +16,36 @@ const PLAYER_CARDS = [
   CARD_ATTRIBUTE.SCISSORS,
 ];
 
-// TODO: move logic to custom hook for readability
+// TODO: move logic to custom hook for readability?
 export function PlayerDesk() {
   const {
-    game: { phase },
+    game: { phase, remainingTime },
     player,
     selectCard,
+    hoverCard,
+    clickCard,
   } = useGame();
 
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
 
   const isTurnPhase = phase === GAME_PHASES.PLAYERS_TURN;
-  const canSelectCard = isTurnPhase && !player.card;
-  const canConfirmSelection = canSelectCard && selectedCard;
+  const timeStillLeft = Number(remainingTime) > 0;
 
-  const handleCardClick = (attr: CARD_ATTRIBUTE) => {
-    if (selectedCard === attr) setSelectedCard(null);
-    else setSelectedCard(attr);
+  const canSelectCard = isTurnPhase && !player.card && timeStillLeft;
+  const canConfirmSelection = canSelectCard && selectedCard && timeStillLeft;
+
+  const handleCardClick = (attr: CARD_ATTRIBUTE, index: number) => {
+    if (selectedCard === attr) {
+      setSelectedCard(null);
+      clickCard(null);
+    } else {
+      setSelectedCard(attr);
+      clickCard(index);
+    }
+    hoverCard(null);
   };
+
+  const randomCards = useMemo(() => shuffle(PLAYER_CARDS), [phase]);
 
   return (
     <VStack w="full">
@@ -49,7 +62,7 @@ export function PlayerDesk() {
               duration: 0.4,
             }}
           >
-            {PLAYER_CARDS.map((card) => (
+            {randomCards.map((card, index) => (
               <Button
                 key={card}
                 variant="plain"
@@ -58,7 +71,11 @@ export function PlayerDesk() {
                 transformOrigin="center"
                 padding={0}
                 disabled={!canSelectCard}
-                onClick={() => handleCardClick(card)}
+                onClick={() => {
+                  handleCardClick(card, index);
+                }}
+                onMouseOver={() => timeStillLeft && hoverCard(index)}
+                onMouseLeave={() => timeStillLeft && hoverCard(null)}
               >
                 <GameCard attr={card} isSelected={card === selectedCard} />
               </Button>

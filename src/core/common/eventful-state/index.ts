@@ -1,4 +1,4 @@
-import { requestTimeout } from "@/utils/common";
+import { entries, requestTimeout } from "@/utils/common";
 
 import * as Eventful from "./types.ts";
 import { EventBus } from "../event-bus";
@@ -18,11 +18,11 @@ export class EventfulState<
   public state;
   private readonly initialState;
 
-  private bus = new EventBus<Eventful.EventMap<Config>>();
-  public addEventListener = this.bus.addEventListener;
-  public addEventListeners = this.bus.addEventListeners;
-  public removeEventListener = this.bus.addEventListener;
-  public removeEventListeners = this.bus.addEventListeners;
+  private bus;
+  public addEventListener;
+  public addEventListeners;
+  public removeEventListener;
+  public removeEventListeners;
 
   constructor(
     state: Eventful.State<Config>,
@@ -34,6 +34,14 @@ export class EventfulState<
   ) {
     this.state = state;
     this.initialState = structuredClone(state);
+
+    this.bus = new EventBus<Eventful.EventMap<Config>>(
+      entries(dispatchMap).map((entries) => entries[1]),
+    );
+    this.addEventListener = this.bus.addEventListener;
+    this.addEventListeners = this.bus.addEventListeners;
+    this.removeEventListener = this.bus.addEventListener;
+    this.removeEventListeners = this.bus.addEventListeners;
 
     this.state = new Proxy(state, {
       set: <
@@ -77,7 +85,7 @@ export class EventfulState<
   }
 
   // Resetting provided keys of state
-  public toInitialState(...args: (keyof Eventful.State<Config>)[]) {
+  public reset(...args: (keyof Eventful.State<Config>)[]) {
     args.forEach((key) => (this.state[key] = this.initialState[key]));
   }
 }

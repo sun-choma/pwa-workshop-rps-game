@@ -1,10 +1,14 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { toaster } from "@/components/ui/toaster";
 
 import { Context } from "@/providers/game/context";
-import { MAX_LIVES } from "@/providers/game/constants";
+import { LEAVE_GAME_TIMEOUT, MAX_LIVES } from "@/providers/game/constants";
 import { GameMaster } from "@/core/game/game-master";
 import { GAME_PHASES, OUTCOME } from "@/core/game/constants";
 import type * as Game from "@/core/game/types";
+import { cancelTimeout, requestTimeout } from "@/utils/common";
+
+const STATUS_TOAST_ID = String(Symbol("STATUS_TOAST_ID"));
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setInitialized] = useState(false);
@@ -20,6 +24,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [playerLives, setPlayerLives] =
     useState<Game.Value<"playerLives">>(MAX_LIVES);
   const [playerCard, setPlayerCard] = useState<Game.Value<"playerCard">>();
+  const [playerDecision, setPlayerDecision] =
+    useState<Game.Value<"playerRematchDecision">>();
 
   const [opponentName, setOpponentName] =
     useState<Game.Value<"opponentName">>("");
@@ -33,6 +39,31 @@ export function GameProvider({ children }: { children: ReactNode }) {
     useState<Game.Value<"opponentCard">>();
   const [isOpponentTurnEnded, setOpponentTurnEnd] =
     useState<Game.Value<"opponentReady">>(false);
+  const [opponentDecision, setOpponentDecision] =
+    useState<Game.Value<"opponentRematchDecision">>();
+
+  const notifyOpponentLeft = useCallback(() => {
+    if (isInitialized) {
+      const endGame = () => {
+        toaster.dismiss(STATUS_TOAST_ID);
+        gameMasterRef.current!.actions.common.exitGame();
+      };
+      const ref = requestTimeout(endGame, LEAVE_GAME_TIMEOUT * 1000);
+      toaster.create({
+        id: STATUS_TOAST_ID,
+        type: "loading",
+        title: "Opponent left",
+        description: `Ending match in ${LEAVE_GAME_TIMEOUT} seconds`,
+        action: {
+          label: "End now",
+          onClick: () => {
+            cancelTimeout(ref);
+            endGame();
+          },
+        },
+      });
+    }
+  }, [isInitialized]);
 
   useEffect(() => {
     if (!gameMasterRef.current) {
@@ -47,21 +78,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
       "player-name-set": setPlayerName,
       "player-lives-change": setPlayerLives,
       "player-card-change": setPlayerCard,
+      "player-rematch-set": setPlayerDecision,
       "opponent-name-set": setOpponentName,
       "opponent-lives-change": setOpponentLives,
       "opponent-hover-change": setOpponentHoverIndex,
       "opponent-selection-change": setOpponentSelectionIndex,
       "opponent-card-change": setOpponentCard,
       "opponent-ready-change": setOpponentTurnEnd,
+      "opponent-rematch-set": setOpponentDecision,
     };
 
     gameMasterRef?.current.addEventListeners(subscriptions);
+    gameMasterRef?.current.addEventListener(
+      "opponent-left",
+      notifyOpponentLeft,
+    );
 
     const ref = gameMasterRef?.current;
     return () => {
       ref.removeEventListeners(subscriptions);
     };
-  }, [gameMasterRef]);
+  }, [gameMasterRef, notifyOpponentLeft]);
 
   const contextValue = {
     game: {
@@ -73,6 +110,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       name: playerName,
       card: playerCard,
       lives: playerLives,
+      rematchDecision: playerDecision,
     },
     opponent: {
       name: opponentName,
@@ -81,11 +119,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
       hoveredCardIndex: opponentHoverIndex,
       selectedCardIndex: opponentSelectionIndex,
       isReady: isOpponentTurnEnded,
+      rematchDecision: opponentDecision,
     },
-    startGame: gameMasterRef.current?.findGame,
-    selectCard: gameMasterRef.current?.selectCard,
-    rematch: gameMasterRef.current?.rematch,
-    returnToMenu: gameMasterRef.current?.returnToMenu,
+    startGame: gameMasterRef.current?.actions.common.findGame,
+    cancelGame: gameMasterRef.current?.actions.common.exitGame,
+    hoverCard: gameMasterRef.current?.actions.match.highlightCard,
+    clickCard: gameMasterRef.current?.actions.match.selectCard,
+    selectCard: gameMasterRef.current?.actions.match.confirmCard,
+    rematch: gameMasterRef.current?.actions.gameEnd.rematch,
+    returnToMenu: gameMasterRef.current?.actions.gameEnd.returnToMenu,
   };
 
   // TODO: create proper INIT phase
