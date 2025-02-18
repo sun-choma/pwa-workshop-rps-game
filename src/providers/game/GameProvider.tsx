@@ -4,7 +4,7 @@ import { toaster } from "@/components/ui/toaster";
 import { Context } from "@/providers/game/context";
 import { LEAVE_GAME_TIMEOUT, MAX_LIVES } from "@/providers/game/constants";
 import { GameMaster } from "@/core/game/game-master";
-import { GAME_PHASES, OUTCOME } from "@/core/game/constants";
+import { GAME_PHASES, OUTCOMES } from "@/core/game/constants";
 import type * as Game from "@/core/game/types";
 import { cancelTimeout, requestTimeout } from "@/utils/common";
 
@@ -17,15 +17,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<Game.Value<"phase">>(GAME_PHASES.INIT);
   const [turnTime, setTurnTime] = useState<Game.Value<"time">>();
   const [outcome, setOutcome] = useState<Game.Value<"turnOutcome">>(
-    OUTCOME.DRAW,
+    OUTCOMES.DRAW,
   );
 
   const [playerName, setPlayerName] = useState<Game.Value<"playerName">>("");
   const [playerLives, setPlayerLives] =
     useState<Game.Value<"playerLives">>(MAX_LIVES);
   const [playerCard, setPlayerCard] = useState<Game.Value<"playerCard">>();
+  const [playerCardIndex, setPlayerCardIndex] =
+    useState<Game.Value<"playerSelectedIndex">>(null);
   const [playerDecision, setPlayerDecision] =
-    useState<Game.Value<"playerRematchDecision">>();
+    useState<Game.Value<"playerRematchDecision">>(null);
 
   const [opponentName, setOpponentName] =
     useState<Game.Value<"opponentName">>("");
@@ -40,8 +42,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [isOpponentTurnEnded, setOpponentTurnEnd] =
     useState<Game.Value<"opponentReady">>(false);
   const [opponentDecision, setOpponentDecision] =
-    useState<Game.Value<"opponentRematchDecision">>();
+    useState<Game.Value<"opponentRematchDecision">>(null);
 
+  // TODO: dismiss toast on "main menu" click
   const notifyOpponentLeft = useCallback(() => {
     if (isInitialized) {
       const endGame = () => {
@@ -78,6 +81,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       "player-name-set": setPlayerName,
       "player-lives-change": setPlayerLives,
       "player-card-change": setPlayerCard,
+      "player-selection-change": setPlayerCardIndex,
       "player-rematch-set": setPlayerDecision,
       "opponent-name-set": setOpponentName,
       "opponent-lives-change": setOpponentLives,
@@ -97,6 +101,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     const ref = gameMasterRef?.current;
     return () => {
       ref.removeEventListeners(subscriptions);
+      ref.removeEventListener("opponent-left", notifyOpponentLeft);
     };
   }, [gameMasterRef, notifyOpponentLeft]);
 
@@ -108,12 +113,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     },
     player: {
       name: playerName,
+      emoji: playerName.split(" ").at(0),
       card: playerCard,
+      selectedCardIndex: playerCardIndex,
       lives: playerLives,
       rematchDecision: playerDecision,
     },
     opponent: {
       name: opponentName,
+      emoji: opponentName.split(" ").at(0),
       card: opponentCard,
       lives: opponentLives,
       hoveredCardIndex: opponentHoverIndex,
@@ -121,7 +129,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       isReady: isOpponentTurnEnded,
       rematchDecision: opponentDecision,
     },
-    startGame: gameMasterRef.current?.actions.common.findGame,
+    startMultiplayer: gameMasterRef.current?.actions.common.startMultiplayer,
+    startSingleplayer: gameMasterRef.current?.actions.common.startSingleplayer,
     cancelGame: gameMasterRef.current?.actions.common.exitGame,
     hoverCard: gameMasterRef.current?.actions.match.highlightCard,
     clickCard: gameMasterRef.current?.actions.match.selectCard,

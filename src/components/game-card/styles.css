@@ -1,0 +1,76 @@
+.card-container {
+  width: 100%;
+  height: 100%;
+
+  perspective: 32rem;
+  padding: 0;
+
+  animation: slide-in 300ms ease-out forwards;
+  animation-delay: calc(var(--index) * 80ms);
+  opacity: 0;
+  transform: translate(calc((var(--index) - 1) * 3rem), calc(-100% * var(--direction))) scale(1.25);
+
+  --index: 0;
+  --direction: -1;
+
+  --bg-subtle: #111;
+  --border-emphasized: #3f3f46;
+  --border-inverted: #e4e4e7;
+}
+
+@keyframes slide-in {
+  100% {
+    opacity: 1;
+    transform: translate(0) scale(1);
+  }
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+
+  transform-style: preserve-3d;
+  position: relative;
+
+  transition: 0.3s ease;
+  text-align: center;
+  border-radius: 0.3rem;
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-emphasized);
+
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+.card-container .card svg {
+  width: 48px;
+  height: 48px;
+}
+
+button:hover:not(:disabled) > .card-container:not(.selected) .card,
+.card-container.hovered .card {
+  transform: translateY(calc(20% * var(--direction)));
+}
+
+
+.card-container.selected .card,
+button > .card-container.selected .card {
+  outline: 1px solid var(--border-inverted);
+  transform: translateY(calc(var(--direction) * 20%)) rotateY(180deg);
+}

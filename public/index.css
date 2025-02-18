@@ -1,34 +1,83 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
-    font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
 
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --thick-square-size: 6.635rem;
+  --thick-square-width: 1px;
+  --thick-square-color: rgba(255, 255, 255, .075);
+
+
+  --thin-square-count: 7;
+  --thin-square-width: 1px;
+  --thin-square-color: rgba(255, 255, 255, .025);
+  --thin-square-size: calc(var(--thick-square-size) / var(--thin-square-count));
 }
 
 body {
-    margin: 0;
-    display: flex;
-    place-items: center;
-    width: 100dvw;
-    height: 100dvh;
-    overflow: hidden;
+  margin: 0;
+  display: flex;
+  place-items: center;
+  width: 100dvw;
+  height: 100dvh;
+  overflow: hidden;
+
+  background-image: linear-gradient(var(--thick-square-color) var(--thick-square-width), transparent var(--thick-square-width)),
+  linear-gradient(90deg, var(--thick-square-color) var(--thick-square-width), transparent var(--thick-square-width));
+  background-size: var(--thick-square-size) var(--thick-square-size), var(--thick-square-size) var(--thick-square-size);
+  background-position: center center, center center;
+
+  --background-color: #242424;
+  background-color: var(--background-color);
 }
 
-b {
-    font-weight: bold;
+body::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  background-image: linear-gradient(var(--thin-square-color) var(--thin-square-width), transparent var(--thin-square-width)),
+  linear-gradient(90deg, var(--thin-square-color) var(--thin-square-width), transparent var(--thin-square-width));
+  background-size: var(--thin-square-size) var(--thin-square-size), var(--thin-square-size) var(--thin-square-size);
+  background-position: center center, center center;
+
+  user-select: none;
+  pointer-events: none;
 }
 
-a {
-    color: #2b90f5;
+.ripple {
+  width: .75rem;
+  height: .75rem;
+  opacity: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  position: absolute;
+  z-index: 1;
+
+  animation: ripple .5s cubic-bezier(0, 0, 0.2, 1);
+  user-select: none;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(10);
+    opacity: 0;
+  }
 }

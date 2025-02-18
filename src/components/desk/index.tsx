@@ -1,24 +1,23 @@
-import { ReactNode } from "react";
+import { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { HStack, Text, VStack } from "@chakra-ui/react";
 import { HeartIcon, HeartOffIcon } from "lucide-react";
-import { AnimatePresence } from "motion/react";
 
-import { MAX_LIVES } from "@/providers/game/constants.ts";
+import { MAX_LIVES } from "@/providers/game/constants";
+import { nodeArray } from "@/utils/common";
 
 import "./styles.css";
-import { nodeArray } from "@/utils/common.ts";
 
-interface DeskProps {
+interface DeskProps extends ComponentPropsWithoutRef<typeof VStack> {
   title: string;
   lives: number;
   children: ReactNode;
 }
 
-export function Desk({ title, lives, children }: DeskProps) {
+export function Desk({ title, lives, children, ...props }: DeskProps) {
   return (
-    <VStack className="card-desk">
-      <HStack className="player-info" w="full" justifyContent="space-around">
+    <VStack className="card-desk" {...props}>
+      <HStack className="player-info">
         <Text>{title}</Text>
         <HStack>
           {nodeArray({
@@ -31,9 +30,7 @@ export function Desk({ title, lives, children }: DeskProps) {
           })}
         </HStack>
       </HStack>
-      <AnimatePresence initial={false} mode="wait">
-        {children}
-      </AnimatePresence>
+      {children}
     </VStack>
   );
 }

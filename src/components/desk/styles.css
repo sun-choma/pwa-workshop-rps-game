@@ -1,22 +1,35 @@
 .card-desk {
-    position: relative;
-    width: 100%;
+  position: relative;
+  width: 100%;
 
-    display: flex;
-}
+  display: flex;
 
-.card-desk:first-of-type {
+  &:first-of-type {
     flex-direction: column;
-}
+  }
 
-.card-desk:last-of-type {
+  &:last-of-type {
     flex-direction: column-reverse;
+  }
+
+  & > .player-info {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .card-grid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 120px));
-    gap: 0.5rem;
-    justify-content: center;
+  width: 100%;
+  aspect-ratio: 20/9;
+  display: flex;
+  justify-content: space-around;
+
+  & > * {
+    flex: 0 0 calc(100% / 3 - var(--thin-square-size) * 0.5);
+  }
+
+  &.ready {
+    opacity: 0.5;
+  }
 }
+

@@ -7,4 +7,5 @@ export const SOCKET_EVENTS = [
   "attr-sent",
   "rematch-decision",
   "opponent-left",
+  "rematch",
 ] as const;

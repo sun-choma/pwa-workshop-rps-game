@@ -17,18 +17,12 @@ export class EventBus<EventMap extends Bus.ValidEventMap<EventMap>> {
 
   constructor(events: readonly (keyof EventMap)[]) {
     this.events = events;
-    this.once = this.once.bind(this);
-    this.addEventListener = this.addEventListener.bind(this);
-    this.addEventListeners = this.addEventListeners.bind(this);
-    this.removeEventListener = this.removeEventListener.bind(this);
-    this.removeEventListeners = this.removeEventListeners.bind(this);
-    this.dispatch = this.dispatch.bind(this);
   }
 
-  once<Event extends Bus.Event<EventMap>>(
+  once = <Event extends Bus.Event<EventMap>>(
     event: Event,
     callback: Bus.Callback<EventMap, Event>,
-  ) {
+  ) => {
     if (this.has(event)) {
       if (!this.consumers.has(event)) {
         this.consumers.set(event, []);
@@ -37,12 +31,12 @@ export class EventBus<EventMap extends Bus.ValidEventMap<EventMap>> {
         .get(event)
         ?.push(callback as Bus.Callback<EventMap, Bus.Event<EventMap>>);
     }
-  }
+  };
 
-  addEventListener<Event extends Bus.Event<EventMap>>(
+  addEventListener = <Event extends Bus.Event<EventMap>>(
     event: Event,
     callback: Bus.Callback<EventMap, Event>,
-  ) {
+  ) => {
     if (this.has(event)) {
       if (!this.subscribers.has(event)) {
         this.subscribers.set(event, []);
@@ -51,25 +45,27 @@ export class EventBus<EventMap extends Bus.ValidEventMap<EventMap>> {
         .get(event)
         ?.push(callback as Bus.Callback<EventMap, Bus.Event<EventMap>>);
     }
-  }
+  };
 
-  addEventListeners<
+  addEventListeners = <
     Events extends Partial<{
       [Event in Bus.Event<EventMap>]: Bus.Callback<EventMap, Event>;
     }>,
-  >(events: Events) {
+  >(
+    events: Events,
+  ) => {
     entries(events).forEach(([event, callback]) => {
       this.addEventListener(
         event as keyof EventMap,
         callback as Bus.Callback<EventMap, Bus.Event<EventMap>>,
       );
     });
-  }
+  };
 
-  removeEventListener<Event extends Bus.Event<EventMap>>(
+  removeEventListener = <Event extends Bus.Event<EventMap>>(
     event: Event,
     callback: Bus.Callback<EventMap, Event>,
-  ) {
+  ) => {
     if (this.has(event)) {
       const eventSubscribers = this.subscribers.get(event);
       if (!eventSubscribers) return;
@@ -86,24 +82,26 @@ export class EventBus<EventMap extends Bus.ValidEventMap<EventMap>> {
         eventSubscribers.splice(index, 1);
       }
     }
-  }
+  };
 
-  removeEventListeners<
+  removeEventListeners = <
     Events extends Partial<{
       [Event in Bus.Event<EventMap>]: Bus.Callback<EventMap, Event>;
     }>,
-  >(events: Events) {
+  >(
+    events: Events,
+  ) => {
     entries(events).forEach(([event, callback]) => {
       this.removeEventListener(
         event as keyof EventMap,
         callback as Bus.Callback<EventMap, Bus.Event<EventMap>>,
       );
     });
-  }
+  };
 
-  dispatch<Event extends Bus.Event<EventMap>>(
+  dispatch = <Event extends Bus.Event<EventMap>>(
     ...args: Bus.FnArgs<EventMap, Event>
-  ) {
+  ) => {
     const [event, payload] = args;
     if (this.has(event)) {
       // Multi-use subscriptions
@@ -130,7 +128,7 @@ export class EventBus<EventMap extends Bus.ValidEventMap<EventMap>> {
         this.consumers.delete(event);
       }
     }
-  }
+  };
 
   private has(event: string | number | symbol) {
     return this.events.includes(event as Bus.Event<EventMap>);

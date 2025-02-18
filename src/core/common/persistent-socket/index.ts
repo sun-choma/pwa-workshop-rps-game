@@ -1,6 +1,7 @@
 import { EventBus } from "@/core/common/event-bus";
 import type * as Bus from "@/core/common/event-bus/types";
 import { requestTimeout } from "@/utils/common";
+import type { Dictionary } from "@/types/common";
 
 import type * as Socket from "./types";
 import { ConstructorArguments } from "./types";
@@ -8,14 +9,10 @@ import { ConstructorArguments } from "./types";
 const RECONNECT_DELAY = [0, 0, 1, 2, 3, 5, 10, 15, 30];
 const WEBSOCKET_EVENTS = ["open", "message", "close", "error"] as const;
 
-// TODO: rename default events (top) to be more descriptive in general context (ui-subscription friendly)
+// TODO: Refactor Constructor Arguments type
 export class PersistentSocket<
-  IncomingMessageMap extends {
-    [Key in keyof IncomingMessageMap]: IncomingMessageMap[Key];
-  },
-  OutgoingMessageMap extends {
-    [Key in keyof OutgoingMessageMap]: OutgoingMessageMap[Key];
-  },
+  IncomingMessageMap extends Dictionary<IncomingMessageMap>,
+  OutgoingMessageMap extends Dictionary<OutgoingMessageMap>,
 > {
   private socket: WebSocket | null = null;
   private readonly url;
@@ -32,10 +29,16 @@ export class PersistentSocket<
 
   constructor({
     url,
-    events,
     protocols,
     options,
-  }: ConstructorArguments & { events: readonly (keyof IncomingMessageMap)[] }) {
+    ...restArgs
+  }: ConstructorArguments &
+    (
+      | { events: readonly (keyof IncomingMessageMap)[] }
+      | {
+          bus: EventBus<IncomingMessageMap>;
+        }
+    )) {
     this.url = url;
     this.protocols = protocols;
     this.options = options;
@@ -48,7 +51,8 @@ export class PersistentSocket<
       error: this.handleError.bind(this),
     });
 
-    this.messageBus = new EventBus<IncomingMessageMap>(events);
+    if ("bus" in restArgs) this.messageBus = restArgs.bus;
+    else this.messageBus = new EventBus<IncomingMessageMap>(restArgs.events);
 
     // Forwarding merged methods for composition usage
     this.events = {
@@ -65,13 +69,11 @@ export class PersistentSocket<
       removeEventListener: this.messageBus.removeEventListener,
       removeEventListeners: this.messageBus.removeEventListeners,
     };
-
-    this.send = this.send.bind(this);
   }
 
-  public send<Event extends Bus.Event<OutgoingMessageMap>>(
+  public send = <Event extends Bus.Event<OutgoingMessageMap>>(
     ...args: Bus.FnArgs<OutgoingMessageMap, Event>
-  ) {
+  ) => {
     const [event, payload] = args;
     console.debug(`[WS] Sending message: ${JSON.stringify(args, null, 2)}`);
 
@@ -86,9 +88,9 @@ export class PersistentSocket<
     if (this.options?.delay && this.options.delay >= 0)
       requestTimeout(fn, this.options.delay);
     else fn();
-  }
+  };
 
-  public connect() {
+  public connect = () => {
     const createConnection = () => {
       console.debug("[WS] Connecting...");
       this.socket = new WebSocket(this.url, this.protocols);
@@ -100,12 +102,12 @@ export class PersistentSocket<
 
     if (RECONNECT_DELAY[this.delayIndex] === 0) createConnection();
     else setTimeout(createConnection, RECONNECT_DELAY[this.delayIndex] * 1000);
-  }
+  };
 
-  public close(...args: Parameters<WebSocket["close"]>) {
+  public close = (...args: Parameters<WebSocket["close"]>) => {
     this.socket?.close(...args);
     this.socket = null;
-  }
+  };
 
   private handleMessage<Event extends keyof IncomingMessageMap>(
     e: MessageEvent,

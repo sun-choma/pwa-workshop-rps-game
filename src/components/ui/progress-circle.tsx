@@ -21,7 +21,10 @@ export const ProgressCircleRing = React.forwardRef<
       <ChakraProgressCircle.Range
         stroke={color}
         strokeLinecap={cap}
-        css={{ transition: `all linear .1s` }}
+        css={{
+          transition: `stroke-dashoffset linear 0.5s`,
+          // willChange: "stroke-dashoffset",
+        }}
       />
     </ChakraProgressCircle.Circle>
   );

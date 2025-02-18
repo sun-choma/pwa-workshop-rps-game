@@ -9,8 +9,6 @@ export type MergeRecords<
       : never;
 };
 
-export type PublicMethods<Instance> = {
-  [Key in keyof Instance]: Instance[Key] extends (...args: never) => unknown
-    ? Key
-    : never;
-}[keyof Instance];
+export type Dictionary<Obj extends { [Key in keyof Obj]: Obj[Key] }> = {
+  [Key in keyof Obj]: Obj[Key];
+};

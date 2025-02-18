@@ -1,22 +1,19 @@
-import { useMemo, useState } from "react";
-
-import { VStack } from "@chakra-ui/react";
-import { motion } from "motion/react";
+import { CSSProperties, useMemo } from "react";
+import { Flex } from "@chakra-ui/react";
 
 import { GameCard } from "@/components/game-card";
 import { useGame } from "@/providers/game/useGame";
 import { Button } from "@/components/ui/button";
 import { Desk } from "@/components/desk";
-import { CARD_ATTRIBUTE, GAME_PHASES } from "@/core/game/constants.ts";
-import { shuffle } from "@/utils/common";
+import { joinClassNames, shuffle } from "@/utils/common";
+import { CARD_ATTRIBUTES, GAME_PHASES } from "@/core/game/constants";
 
 const PLAYER_CARDS = [
-  CARD_ATTRIBUTE.ROCK,
-  CARD_ATTRIBUTE.PAPER,
-  CARD_ATTRIBUTE.SCISSORS,
+  CARD_ATTRIBUTES.ROCK,
+  CARD_ATTRIBUTES.PAPER,
+  CARD_ATTRIBUTES.SCISSORS,
 ];
 
-// TODO: move logic to custom hook for readability?
 export function PlayerDesk() {
   const {
     game: { phase, remainingTime },
@@ -25,84 +22,57 @@ export function PlayerDesk() {
     hoverCard,
     clickCard,
   } = useGame();
-
-  const [selectedCard, setSelectedCard] = useState<number | null>(null);
-
   const isTurnPhase = phase === GAME_PHASES.PLAYERS_TURN;
   const timeStillLeft = Number(remainingTime) > 0;
 
   const canSelectCard = isTurnPhase && !player.card && timeStillLeft;
-  const canConfirmSelection = canSelectCard && selectedCard && timeStillLeft;
-
-  const handleCardClick = (attr: CARD_ATTRIBUTE, index: number) => {
-    if (selectedCard === attr) {
-      setSelectedCard(null);
-      clickCard(null);
-    } else {
-      setSelectedCard(attr);
-      clickCard(index);
-    }
-    hoverCard(null);
-  };
 
   const randomCards = useMemo(() => shuffle(PLAYER_CARDS), [phase]);
 
+  const handleCardClick = (attr: CARD_ATTRIBUTES, index: number) => {
+    if (randomCards[player.selectedCardIndex ?? -1] === attr) selectCard(attr);
+    else clickCard(index);
+    hoverCard(null);
+  };
+
   return (
-    <VStack w="full">
-      <Desk title={player.name} lives={player.lives}>
-        {isTurnPhase ? (
-          <motion.div
-            key="turn"
-            className="card-grid"
-            initial={{ opacity: 0, y: 200 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 300 }}
-            transition={{
-              ease: "easeOut",
-              duration: 0.4,
-            }}
-          >
-            {randomCards.map((card, index) => (
-              <Button
-                key={card}
-                variant="plain"
-                w="full"
-                h="full"
-                transformOrigin="center"
-                padding={0}
-                disabled={!canSelectCard}
-                onClick={() => {
-                  handleCardClick(card, index);
-                }}
-                onMouseOver={() => timeStillLeft && hoverCard(index)}
-                onMouseLeave={() => timeStillLeft && hoverCard(null)}
-              >
-                <GameCard attr={card} isSelected={card === selectedCard} />
-              </Button>
-            ))}
-          </motion.div>
-        ) : (
-          <motion.div
-            key="results"
-            className="card-grid"
-            initial={{ opacity: 0, y: 200 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 300 }}
-            transition={{
-              ease: "easeOut",
-              duration: 0.2,
-            }}
-          >
-            <GameCard key="card" attr={player.card} layout />
-          </motion.div>
+    <Desk title={player.name} lives={player.lives}>
+      <Flex
+        className={joinClassNames(
+          "card-grid",
+          isTurnPhase && player.isReady && "ready",
         )}
-      </Desk>
-      <Button
-        disabled={!canConfirmSelection}
-        onClick={() => selectCard(selectedCard!)}
       >
-        End turn
-      </Button>
-    </VStack>
+        {isTurnPhase &&
+          randomCards.map((card, index) => (
+            <Button
+              key={card}
+              variant="plain"
+              w="full"
+              h="full"
+              transformOrigin="center"
+              padding={0}
+              disabled={!canSelectCard}
+              onClick={() => handleCardClick(card, index)}
+              onMouseOver={() => timeStillLeft && hoverCard(index)}
+              onMouseLeave={() => timeStillLeft && hoverCard(null)}
+            >
+              <GameCard
+                attr={card}
+                isSelected={index === player.selectedCardIndex}
+                style={{ "--index": index, "--direction": -1 } as CSSProperties}
+              />
+            </Button>
+          ))}
+        {!isTurnPhase && (
+          <GameCard
+            key="card"
+            attr={player.card}
+            style={{ "--index": 1, "--direction": -1 } as CSSProperties}
+            mx="auto"
+          />
+        )}
+      </Flex>
+    </Desk>
   );
 }

@@ -1,0 +1,44 @@
+.shake {
+  --offset: 0;
+
+  animation: shake 3s ease-in-out infinite;
+  animation-delay: calc(var(--offset) * 0.08s);
+  pointer-events: none;
+}
+
+@keyframes shake {
+  0% {
+    opacity: 0;
+  }
+  12.5% {
+    transform: translateY(-2rem);
+    opacity: 0;
+  }
+  25% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  37.5% {
+    transform: translateY(-.5rem);
+  }
+  50% {
+    transform: translateY(.5rem);
+  }
+  62.5% {
+    transform: translateY(-.5rem);
+  }
+  75% {
+    transform: translateY(.5rem);
+  }
+  87.5% {
+    transform: translateY(-2rem);
+    opacity: 1;
+  }
+  98% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(2rem);
+    opacity: 0;
+  }
+}

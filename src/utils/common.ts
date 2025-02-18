@@ -14,33 +14,63 @@ export function nodeArray<Node extends ReactNode>(params: {
 }
 
 type Callback = () => void;
-type CallbackObject = {
+export type TimeoutConfig = {
   onTick?: (remainingTime: number) => void;
   onTimeout?: () => void;
 };
 
-export function requestTimeout(fn: Callback | CallbackObject, delayMs = 0) {
-  let startTime: number;
+export function requestTimeout(
+  fn: Callback | TimeoutConfig,
+  delayMs = 0,
+  maxFps = Infinity,
+) {
   const runtimeObj: {
     animationFrameId: number | null;
   } = {
     animationFrameId: null,
   };
 
-  const isObject = typeof fn === "object";
+  let startTime: number;
+  let lastExecutedTimestamp: number;
+
+  const isConfig = typeof fn === "object";
+
+  const tick = (time: number) => isConfig && fn.onTick?.(time);
+  const timeout = () => (isConfig ? fn.onTimeout?.() : fn());
 
   function frameCallback(timestamp: number) {
-    if (!startTime) startTime = timestamp;
-    if (runtimeObj.animationFrameId) {
-      if (isObject) fn.onTick?.(Math.max(delayMs - (timestamp - startTime), 0));
+    if (!startTime) {
+      startTime = timestamp;
+      lastExecutedTimestamp = timestamp;
+    }
 
-      if (timestamp - startTime >= delayMs) {
-        if (isObject) fn.onTimeout?.();
-        else fn();
+    const factor = 0.1 * (maxFps / 60);
+    const adjustedMaxFps = maxFps + maxFps * factor;
+    const currentFramerate = 1000 / (timestamp - lastExecutedTimestamp);
+
+    const shouldThrottle =
+      isFinite(currentFramerate) && currentFramerate > adjustedMaxFps;
+    const shouldRequestFrame =
+      shouldThrottle || timestamp - startTime < delayMs;
+    const shouldRunCallback =
+      !shouldThrottle && runtimeObj.animationFrameId !== null;
+
+    const remainingTime = Math.max(delayMs - (timestamp - startTime), 0);
+
+    if (!shouldThrottle) lastExecutedTimestamp = timestamp;
+
+    // just a regular tick of animation, executed on every update (including last one)
+    if (shouldRunCallback) tick(remainingTime);
+
+    if (shouldRequestFrame) {
+      runtimeObj.animationFrameId = requestAnimationFrame(frameCallback);
+    } else {
+      if (runtimeObj.animationFrameId)
         cancelAnimationFrame(runtimeObj.animationFrameId);
-        runtimeObj.animationFrameId = null;
-      } else if (runtimeObj.animationFrameId)
-        runtimeObj.animationFrameId = requestAnimationFrame(frameCallback);
+      runtimeObj.animationFrameId = null;
+
+      // animation wasn't stopped manually, so this is the last frame of animation
+      if (shouldRunCallback) timeout();
     }
   }
 

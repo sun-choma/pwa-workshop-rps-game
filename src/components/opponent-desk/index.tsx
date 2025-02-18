@@ -1,10 +1,11 @@
-import { motion } from "motion/react";
+import { CSSProperties } from "react";
+import { Flex } from "@chakra-ui/react";
 
 import { GameCard } from "@/components/game-card";
 import { Desk } from "@/components/desk";
 import { useGame } from "@/providers/game/useGame";
-import { joinClassNames, nodeArray } from "@/utils/common.ts";
-import { CARD_ATTRIBUTE, GAME_PHASES } from "@/core/game/constants.ts";
+import { joinClassNames, nodeArray } from "@/utils/common";
+import { CARD_ATTRIBUTES, GAME_PHASES } from "@/core/game/constants";
 
 export function OpponentDesk() {
   const { opponent, game } = useGame();
@@ -13,42 +14,37 @@ export function OpponentDesk() {
 
   return (
     <Desk title={opponent.name} lives={opponent.lives}>
-      {isTurnPhase ? (
-        <motion.div
-          key="turn"
-          className="card-grid"
-          initial={{ opacity: 0, y: -200 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -300 }}
-        >
-          {nodeArray({
+      <Flex
+        className={joinClassNames(
+          "card-grid",
+          isTurnPhase && opponent.isReady && "ready",
+        )}
+      >
+        {isTurnPhase &&
+          nodeArray({
             length: 3,
             item: (index) => (
               <GameCard
                 key={index}
-                attr={CARD_ATTRIBUTE.NONE}
+                w="full"
+                h="full"
+                transformOrigin="center"
+                padding={0}
+                attr={CARD_ATTRIBUTES.NONE}
                 isSelected={index === opponent.selectedCardIndex}
                 isHovered={index === opponent.hoveredCardIndex}
-                className={joinClassNames(opponent.isReady && "ready")}
+                style={{ "--index": index, "--direction": 1 } as CSSProperties}
               />
             ),
           })}
-        </motion.div>
-      ) : (
-        <motion.div
-          key="results"
-          className="card-grid"
-          initial={{ opacity: 0, y: -200 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -300 }}
-          transition={{
-            ease: "easeOut",
-            duration: 0.2,
-          }}
-        >
-          <GameCard attr={opponent.card} />
-        </motion.div>
-      )}
+        {!isTurnPhase && (
+          <GameCard
+            attr={opponent.card}
+            style={{ "--index": 1, "--direction": 1 } as CSSProperties}
+            mx="auto"
+          />
+        )}
+      </Flex>
     </Desk>
   );
 }

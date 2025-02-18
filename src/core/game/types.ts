@@ -24,6 +24,11 @@ export const enum CardAttribute {
   SCISSORS,
 }
 
+export const enum GameMode {
+  SINGLEPLAYER,
+  MULTIPLAYER,
+}
+
 export interface GameStateConfig {
   phase: {
     triggers: "phase-change";
@@ -44,6 +49,10 @@ export interface GameStateConfig {
   playerCard: {
     triggers: "player-card-change";
     type: CardAttribute | null;
+  };
+  playerSelectedIndex: {
+    triggers: "player-selection-change";
+    type: number | null;
   };
   opponentName: {
     triggers: "opponent-name-set";

@@ -1,18 +1,23 @@
-import { cancelTimeout, requestTimeout } from "@/utils/common.ts";
+import {
+  cancelTimeout,
+  requestTimeout,
+  TimeoutConfig,
+} from "@/utils/common.ts";
+import { MergeRecords } from "@/types/common";
 
-type TimeoutConfig = Parameters<typeof requestTimeout>[0];
+type TimerConfig = Partial<MergeRecords<TimeoutConfig, { maxFps: number }>>;
 
 export class Timer {
   private timeoutId: ReturnType<typeof requestTimeout>;
-  private readonly config: TimeoutConfig;
+  private readonly config: TimerConfig;
 
-  constructor(config?: TimeoutConfig) {
+  constructor(config?: TimerConfig) {
     if (config) this.config = config;
     else this.config = {};
     this.timeoutId = { animationFrameId: null };
   }
 
-  public run(seconds: number, config?: TimeoutConfig) {
+  public run(seconds: number, config?: Parameters<typeof requestTimeout>[0]) {
     this.stop();
     this.timeoutId = requestTimeout(
       {
@@ -30,6 +35,7 @@ export class Timer {
         },
       },
       seconds * 1000,
+      this.config?.maxFps,
     );
   }
 

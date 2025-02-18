@@ -1,0 +1,57 @@
+.cross {
+  position: relative;
+  width: 1rem;
+  height: 1rem;
+}
+
+.cross::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12rem;
+  height: 2px;
+  background-color: gray;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.cross::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12rem;
+  height: 2px;
+  background-color: gray;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.sunbear,
+.react,
+.vite {
+  transition: filter .3s;
+}
+
+.sunbear {
+  filter: drop-shadow(0 0 1rem #f20f2077);
+}
+
+.sunbear:hover {
+  filter: drop-shadow(0 0 1.5rem #f20f20);
+}
+
+.react {
+  filter: drop-shadow(0 0 1rem #58c4dc50);
+}
+
+.react:hover {
+  filter: drop-shadow(0 0 1.5rem #58c4dc);
+}
+
+.vite {
+  filter: drop-shadow(0 0 1rem #bd34fe50);
+}
+
+.vite:hover {
+  filter: drop-shadow(0 0 1.5rem #bd34fe);
+}

@@ -5,11 +5,11 @@ import { GamePhase, GameStateConfig, Outcome } from "./types";
 
 export {
   GamePhase as GAME_PHASES,
-  Outcome as OUTCOME,
-  RematchDecision as REMATCH_DECISION,
-  CardAttribute as CARD_ATTRIBUTE,
+  Outcome as OUTCOMES,
+  RematchDecision as REMATCH_DECISIONS,
+  CardAttribute as CARD_ATTRIBUTES,
+  GameMode as GAME_MODES,
 } from "./types";
-export const DEFAULT_OPPONENT_NAME = "Computer";
 
 export const INITIAL_STATE: Eventful.State<GameStateConfig> = {
   phase: GamePhase.INIT,
@@ -19,6 +19,7 @@ export const INITIAL_STATE: Eventful.State<GameStateConfig> = {
   playerName: "",
   playerLives: MAX_LIVES,
   playerCard: null,
+  playerSelectedIndex: null,
   playerRematchDecision: null,
 
   opponentName: "",
@@ -40,6 +41,7 @@ export const FIELD_DISPATCH_MAP: Record<
 
   playerName: "player-name-set",
   playerCard: "player-card-change",
+  playerSelectedIndex: "player-selection-change",
   playerLives: "player-lives-change",
   playerRematchDecision: "player-rematch-set",
 

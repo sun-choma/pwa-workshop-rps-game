@@ -1,0 +1,85 @@
+import type * as Bus from "@/core/common/event-bus/types";
+import { EventBus } from "@/core/common/event-bus";
+import { REMATCH_DECISIONS } from "@/core/game/constants";
+import { TURN_RESULTS_TIME, TURN_TIME } from "@/providers/game/constants";
+import { selectRandomCard } from "@/utils/game";
+import { requestTimeout } from "@/utils/common";
+import { offsetRandom, randomSum } from "@/utils/math";
+
+import type { MessagePayloadMap, SendPayloadMap } from "../types";
+
+export class SingleplayerController {
+  private messageBus;
+
+  constructor(bus: EventBus<MessagePayloadMap>) {
+    this.messageBus = bus;
+  }
+
+  startGame() {
+    this.messageBus.dispatch("match-found", `MiGhTy OpPoNeNt`);
+    this.offlineTurn();
+  }
+
+  send = <Event extends Bus.Event<SendPayloadMap>>(
+    ...args: Bus.FnArgs<SendPayloadMap, Event>
+  ) => {
+    const [event, payload] = args;
+    console.debug(`[SP] Sending message: ${JSON.stringify(args, null, 2)}`);
+
+    switch (event) {
+      case "turn-start":
+        this.messageBus.dispatch("turn-start");
+        this.offlineTurn();
+        break;
+      // case "turn-finished":
+      //   this.messageBus.dispatch("turn-finished");
+      //   break;
+      case "attr-sent":
+        this.messageBus.dispatch("attr-sent", selectRandomCard());
+        break;
+      case "rematch-decision":
+        if (payload === REMATCH_DECISIONS.REMATCH) {
+          this.messageBus.dispatch(
+            "rematch-decision",
+            REMATCH_DECISIONS.REMATCH,
+          );
+          this.messageBus.dispatch("rematch");
+          this.offlineTurn();
+        }
+        break;
+    }
+  };
+
+  private offlineTurn() {
+    const decideAfter = offsetRandom(
+      TURN_RESULTS_TIME * 1000,
+      (TURN_TIME / 2) * 1000,
+    );
+    console.debug(`[SP] Opponent will decide in ${decideAfter} ms`);
+
+    const dispatchHover = (index: number | null) =>
+      this.messageBus.dispatch("hover-card", index);
+
+    const dispatchSelect = (index: number) => {
+      this.messageBus.dispatch("select-card", index);
+      this.messageBus.dispatch("turn-finished");
+    };
+
+    const hoverBehavior = randomSum(decideAfter, 500);
+    let stepIndex = 0;
+
+    const nextStep = () => {
+      const isLastStep = hoverBehavior[stepIndex + 1] === undefined;
+
+      requestTimeout(() => {
+        const method = isLastStep ? dispatchSelect : dispatchHover;
+        const randomCardIndex = offsetRandom(0, 2);
+        method(randomCardIndex);
+        stepIndex += 1;
+        if (isLastStep) dispatchHover(null);
+        else nextStep();
+      }, hoverBehavior[stepIndex]);
+    };
+    nextStep();
+  }
+}

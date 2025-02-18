@@ -19,4 +19,5 @@ export interface MessagePayloadMap {
   "attr-sent": [attr: CardAttribute];
   "rematch-decision": [decision: RematchDecision];
   "opponent-left": null;
+  rematch: null;
 }

@@ -1,4 +1,4 @@
-import { entries, requestTimeout } from "@/utils/common";
+import { entries } from "@/utils/common";
 
 import * as Eventful from "./types.ts";
 import { EventBus } from "../event-bus";
@@ -64,13 +64,10 @@ export class EventfulState<
               );
             }
             const event = dispatchMap[key];
-            // Adding minimal artificial throttling to avoid event collisions
-            requestTimeout(() =>
-              this.bus.dispatch(
-                ...([event, value] as unknown as Parameters<
-                  typeof this.bus.dispatch
-                >),
-              ),
+            this.bus.dispatch(
+              ...([event, value] as unknown as Parameters<
+                typeof this.bus.dispatch
+              >),
             );
           }
           return true;
