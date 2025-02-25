@@ -12,3 +12,11 @@ export type MergeRecords<
 export type Dictionary<Obj extends { [Key in keyof Obj]: Obj[Key] }> = {
   [Key in keyof Obj]: Obj[Key];
 };
+
+export interface ApiResponse<Payload> {
+  payload: Payload;
+  meta?: {
+    isCached: boolean;
+    timestamp: number;
+  };
+}

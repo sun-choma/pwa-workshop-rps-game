@@ -5,7 +5,7 @@ export function useRipple() {
     const clickHandler = (ev: MouseEvent) => {
       const rippleNode = document.querySelector(".ripple");
       const clonedNode = rippleNode?.cloneNode(true) as HTMLDivElement;
-      if (rippleNode && clonedNode) {
+      if (rippleNode && clonedNode && ev.detail > 0) {
         clonedNode.style.left = `${ev.clientX - 5}px`;
         clonedNode.style.top = `${ev.clientY - 5}px`;
         rippleNode.replaceWith(clonedNode);

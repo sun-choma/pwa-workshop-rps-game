@@ -30,6 +30,7 @@
 .react,
 .vite {
   transition: filter .3s;
+  user-select: none;
 }
 
 .sunbear {

@@ -17,45 +17,6 @@ export const GAME_RESULT_LABELS = {
   LOSE: "😭",
 };
 
-const EMOJI_CONFIG_BASE = {
-  physics: {
-    gravity: 0,
-    initialVelocities: {
-      x: { min: -15, max: 15 },
-      y: { min: -15, max: 15 },
-    },
-  },
-  position: {
-    x: innerWidth / 2,
-    y: 0,
-  },
-};
-
-export const EMOJI_CONFIG = {
-  [OUTCOMES.PLAYER_WON]: {
-    ...EMOJI_CONFIG_BASE,
-    emojis: [
-      "🏆",
-      "🎉",
-      "🥇",
-      "🙌",
-      "🎯",
-      "💪",
-      "🔥",
-      "🏅",
-      "🎊",
-      "🥳",
-      "✨",
-      "🎉",
-    ],
-  },
-  [OUTCOMES.DRAW]: {},
-  [OUTCOMES.OPPONENT_WON]: {
-    ...EMOJI_CONFIG_BASE,
-    emojis: ["😔", "😢", "😭", "💔", "😞"],
-  },
-};
-
 export const TIMER_PHASES = [
   GAME_PHASES.PLAYERS_TURN,
   GAME_PHASES.TURN_RESULTS,

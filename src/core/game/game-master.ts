@@ -220,6 +220,7 @@ export class GameMaster {
       this.core.reset(
         "turnOutcome",
         "playerCard",
+        "playerSelectedIndex",
         "playerLives",
         "playerRematchDecision",
         "opponentCard",

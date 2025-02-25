@@ -1,24 +1,47 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { toaster } from "@/components/ui/toaster";
 
+import { toaster } from "@/components/ui/toaster";
+import { Overlay } from "@/components/overlay";
 import { Context } from "@/providers/game/context";
-import { LEAVE_GAME_TIMEOUT, MAX_LIVES } from "@/providers/game/constants";
+import {
+  LEAVE_GAME_TIMEOUT,
+  MAX_LIVES,
+  SERVER_WAIT_TIME,
+} from "@/providers/game/constants";
 import { GameMaster } from "@/core/game/game-master";
 import { GAME_PHASES, OUTCOMES } from "@/core/game/constants";
 import type * as Game from "@/core/game/types";
 import { cancelTimeout, requestTimeout } from "@/utils/common";
+import { GameContext } from "@/providers/game/types";
+import { offsetRandom } from "@/utils/math";
 
 const STATUS_TOAST_ID = String(Symbol("STATUS_TOAST_ID"));
 
 export function GameProvider({ children }: { children: ReactNode }) {
-  const [isInitialized, setInitialized] = useState(false);
-  const gameMasterRef = useRef<GameMaster>();
+  const gameMasterRef = useRef<GameMaster>(new GameMaster());
 
   const [phase, setPhase] = useState<Game.Value<"phase">>(GAME_PHASES.INIT);
   const [turnTime, setTurnTime] = useState<Game.Value<"time">>();
   const [outcome, setOutcome] = useState<Game.Value<"turnOutcome">>(
     OUTCOMES.DRAW,
   );
+
+  const [multiplayerState, setMultiplayerState] =
+    useState<GameContext["multiplayerState"]>("waiting");
+
+  useEffect(() => {
+    const serverAsleepTimeout = requestTimeout(
+      () => setMultiplayerState("too-long"),
+      SERVER_WAIT_TIME,
+    );
+    fetch("/api/ping").then(() => {
+      cancelTimeout(serverAsleepTimeout);
+      setMultiplayerState("ready");
+    });
+    return () => {
+      cancelTimeout(serverAsleepTimeout);
+    };
+  }, []);
 
   const [playerName, setPlayerName] = useState<Game.Value<"playerName">>("");
   const [playerLives, setPlayerLives] =
@@ -44,36 +67,28 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [opponentDecision, setOpponentDecision] =
     useState<Game.Value<"opponentRematchDecision">>(null);
 
-  // TODO: dismiss toast on "main menu" click
   const notifyOpponentLeft = useCallback(() => {
-    if (isInitialized) {
-      const endGame = () => {
-        toaster.dismiss(STATUS_TOAST_ID);
-        gameMasterRef.current!.actions.common.exitGame();
-      };
-      const ref = requestTimeout(endGame, LEAVE_GAME_TIMEOUT * 1000);
-      toaster.create({
-        id: STATUS_TOAST_ID,
-        type: "loading",
-        title: "Opponent left",
-        description: `Ending match in ${LEAVE_GAME_TIMEOUT} seconds`,
-        action: {
-          label: "End now",
-          onClick: () => {
-            cancelTimeout(ref);
-            endGame();
-          },
+    const endGame = () => {
+      toaster.dismiss(STATUS_TOAST_ID);
+      gameMasterRef.current.actions.common.exitGame();
+    };
+    const ref = requestTimeout(endGame, LEAVE_GAME_TIMEOUT * 1000);
+    toaster.create({
+      id: STATUS_TOAST_ID,
+      type: "loading",
+      title: "Opponent left",
+      description: `Ending match in ${LEAVE_GAME_TIMEOUT} seconds`,
+      action: {
+        label: "End now",
+        onClick: () => {
+          cancelTimeout(ref);
+          endGame();
         },
-      });
-    }
-  }, [isInitialized]);
+      },
+    });
+  }, []);
 
   useEffect(() => {
-    if (!gameMasterRef.current) {
-      gameMasterRef.current = new GameMaster();
-      setInitialized(true);
-    }
-
     const subscriptions = {
       "phase-change": setPhase,
       "time-change": setTurnTime,
@@ -98,12 +113,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
       notifyOpponentLeft,
     );
 
-    const ref = gameMasterRef?.current;
+    const ref = gameMasterRef.current;
     return () => {
       ref.removeEventListeners(subscriptions);
       ref.removeEventListener("opponent-left", notifyOpponentLeft);
     };
   }, [gameMasterRef, notifyOpponentLeft]);
+
+  const chooseRandom = useCallback(() => {
+    let randomIndex = offsetRandom(0, 2);
+    while (randomIndex === playerCardIndex) randomIndex = offsetRandom(0, 2);
+
+    gameMasterRef.current.actions.match.selectCard(randomIndex);
+  }, [playerCardIndex]);
+
+  const returnToMenu = useCallback(() => {
+    toaster.dismiss(STATUS_TOAST_ID);
+    gameMasterRef.current.actions.gameEnd.returnToMenu();
+  }, []);
 
   const contextValue = {
     game: {
@@ -129,16 +156,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
       isReady: isOpponentTurnEnded,
       rematchDecision: opponentDecision,
     },
-    startMultiplayer: gameMasterRef.current?.actions.common.startMultiplayer,
-    startSingleplayer: gameMasterRef.current?.actions.common.startSingleplayer,
-    cancelGame: gameMasterRef.current?.actions.common.exitGame,
-    hoverCard: gameMasterRef.current?.actions.match.highlightCard,
-    clickCard: gameMasterRef.current?.actions.match.selectCard,
-    selectCard: gameMasterRef.current?.actions.match.confirmCard,
-    rematch: gameMasterRef.current?.actions.gameEnd.rematch,
-    returnToMenu: gameMasterRef.current?.actions.gameEnd.returnToMenu,
+    multiplayerState,
+    startMultiplayer: gameMasterRef.current.actions.common.startMultiplayer,
+    startSingleplayer: gameMasterRef.current.actions.common.startSingleplayer,
+    cancelGame: gameMasterRef.current.actions.common.exitGame,
+    hoverCard: gameMasterRef.current.actions.match.highlightCard,
+    clickCard: gameMasterRef.current.actions.match.selectCard,
+    selectCard: gameMasterRef.current.actions.match.confirmCard,
+    chooseRandom,
+    rematch: gameMasterRef.current.actions.gameEnd.rematch,
+    returnToMenu,
   };
 
-  // TODO: create proper INIT phase
-  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
+  return (
+    <Context.Provider value={contextValue}>
+      <Overlay multiplayerState={multiplayerState}>{children}</Overlay>
+    </Context.Provider>
+  );
 }

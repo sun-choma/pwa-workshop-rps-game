@@ -20,7 +20,7 @@ export function usePwa() {
     return () => {
       media.removeEventListener("change", getInstalled);
     };
-  }, []);
+  }, [getInstalled]);
 
   return { isInstalled };
 }

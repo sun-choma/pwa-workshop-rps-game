@@ -39,6 +39,13 @@ export class SessionManager {
   }
 
   suspend() {
-    if ("disconnect" in this.controller) this.controller.disconnect();
+    switch (true) {
+      case this.controller instanceof MultiplayerController:
+        this.controller.disconnect();
+        break;
+      case this.controller instanceof SingleplayerController:
+        this.controller.endGame();
+        break;
+    }
   }
 }

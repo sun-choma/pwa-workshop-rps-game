@@ -17,6 +17,7 @@ interface Player {
 }
 
 export interface GameContext {
+  multiplayerState: "waiting" | "too-long" | "ready";
   game: {
     phase: GAME_PHASES;
     remainingTime: number | null | undefined;
@@ -30,6 +31,7 @@ export interface GameContext {
   hoverCard: (cardIndex: number | null) => void;
   clickCard: (cardIndex: number | null) => void;
   selectCard: (attr: CARD_ATTRIBUTES) => void;
+  chooseRandom: () => void;
   rematch: () => void;
   returnToMenu: () => void;
 }

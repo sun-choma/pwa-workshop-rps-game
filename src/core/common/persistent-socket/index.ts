@@ -4,12 +4,11 @@ import { requestTimeout } from "@/utils/common";
 import type { Dictionary } from "@/types/common";
 
 import type * as Socket from "./types";
-import { ConstructorArguments } from "./types";
+import { BusConstructorArguments, EventConstructorArguments } from "./types";
 
 const RECONNECT_DELAY = [0, 0, 1, 2, 3, 5, 10, 15, 30];
 const WEBSOCKET_EVENTS = ["open", "message", "close", "error"] as const;
 
-// TODO: Refactor Constructor Arguments type
 export class PersistentSocket<
   IncomingMessageMap extends Dictionary<IncomingMessageMap>,
   OutgoingMessageMap extends Dictionary<OutgoingMessageMap>,
@@ -20,6 +19,7 @@ export class PersistentSocket<
   private readonly options;
   private delayIndex = 0;
   public readonly readyState = this.socket?.readyState;
+  private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
 
   private readonly eventBus;
   public events;
@@ -32,13 +32,9 @@ export class PersistentSocket<
     protocols,
     options,
     ...restArgs
-  }: ConstructorArguments &
-    (
-      | { events: readonly (keyof IncomingMessageMap)[] }
-      | {
-          bus: EventBus<IncomingMessageMap>;
-        }
-    )) {
+  }:
+    | EventConstructorArguments<IncomingMessageMap>
+    | BusConstructorArguments<IncomingMessageMap>) {
     this.url = url;
     this.protocols = protocols;
     this.options = options;
@@ -101,12 +97,19 @@ export class PersistentSocket<
     };
 
     if (RECONNECT_DELAY[this.delayIndex] === 0) createConnection();
-    else setTimeout(createConnection, RECONNECT_DELAY[this.delayIndex] * 1000);
+    else
+      this.reconnectTimeout = setTimeout(
+        createConnection,
+        RECONNECT_DELAY[this.delayIndex] * 1000,
+      );
   };
 
   public close = (...args: Parameters<WebSocket["close"]>) => {
     this.socket?.close(...args);
     this.socket = null;
+
+    if (this.reconnectTimeout) clearTimeout(this.reconnectTimeout);
+    this.reconnectTimeout = null;
   };
 
   private handleMessage<Event extends keyof IncomingMessageMap>(

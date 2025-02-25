@@ -1,23 +1,36 @@
+import { generate } from "random-words";
+
 import type * as Bus from "@/core/common/event-bus/types";
 import { EventBus } from "@/core/common/event-bus";
 import { REMATCH_DECISIONS } from "@/core/game/constants";
 import { TURN_RESULTS_TIME, TURN_TIME } from "@/providers/game/constants";
 import { selectRandomCard } from "@/utils/game";
-import { requestTimeout } from "@/utils/common";
+import { cancelTimeout, getRandomEmoji, requestTimeout } from "@/utils/common";
 import { offsetRandom, randomSum } from "@/utils/math";
 
 import type { MessagePayloadMap, SendPayloadMap } from "../types";
 
 export class SingleplayerController {
   private messageBus;
+  private turnStepTimeout: ReturnType<typeof requestTimeout> | null = null;
 
   constructor(bus: EventBus<MessagePayloadMap>) {
     this.messageBus = bus;
   }
 
   startGame() {
-    this.messageBus.dispatch("match-found", `MiGhTy OpPoNeNt`);
+    this.messageBus.dispatch(
+      "match-found",
+      `${getRandomEmoji()} ${(generate(offsetRandom(1, 3)) as string[]).join("-")}`,
+    );
     this.offlineTurn();
+  }
+
+  endGame() {
+    if (this.turnStepTimeout !== null) {
+      cancelTimeout(this.turnStepTimeout);
+      this.turnStepTimeout = null;
+    }
   }
 
   send = <Event extends Bus.Event<SendPayloadMap>>(
@@ -71,7 +84,10 @@ export class SingleplayerController {
     const nextStep = () => {
       const isLastStep = hoverBehavior[stepIndex + 1] === undefined;
 
-      requestTimeout(() => {
+      console.debug(
+        `[SP] Starting new step in ${hoverBehavior[stepIndex]} ms...`,
+      );
+      this.turnStepTimeout = requestTimeout(() => {
         const method = isLastStep ? dispatchSelect : dispatchHover;
         const randomCardIndex = offsetRandom(0, 2);
         method(randomCardIndex);

@@ -1,20 +1,36 @@
 import { useState } from "react";
-import { Input, Presence, VStack } from "@chakra-ui/react";
+import { generate } from "random-words";
+import { RotateCcwIcon } from "lucide-react";
+import {
+  Group,
+  IconButton,
+  Input,
+  InputAddon,
+  Presence,
+  VStack,
+} from "@chakra-ui/react";
 
 import { GAME_PHASES } from "@/core/game/constants";
 import { Button } from "@/components/ui/button";
 import { useGame } from "@/providers/game/useGame";
+import { offsetRandom } from "@/utils/math";
+import { useConnectivity } from "@/hooks/useConnectivity";
 
 import "./styles.css";
 
+const randomizeName = () =>
+  (generate(offsetRandom(1, 3)) as string[]).join("-");
+
 export function GameModesForm() {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(randomizeName());
   const {
     game: { phase },
     startSingleplayer,
     startMultiplayer,
+    multiplayerState,
     cancelGame,
   } = useGame();
+  const { isOnline } = useConnectivity();
 
   return (
     <VStack
@@ -26,14 +42,24 @@ export function GameModesForm() {
       boxSizing="border-box"
       padding="calc(var(--thick-square-size) / 4)"
     >
-      <Input
-        variant="subtle"
-        placeholder="Username"
-        maxW="calc(var(--thick-square-size) * 4)"
-        value={username}
-        disabled={phase === GAME_PHASES.MATCHING}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+      <Group attached w="full" maxW="calc(var(--thick-square-size) * 4)">
+        <Input
+          variant="subtle"
+          placeholder="Username"
+          value={username}
+          disabled={phase === GAME_PHASES.MATCHING}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <InputAddon border="1px" p="0">
+          <IconButton
+            variant="ghost"
+            onClick={() => setUsername(randomizeName())}
+            disabled={phase === GAME_PHASES.MATCHING}
+          >
+            <RotateCcwIcon />
+          </IconButton>
+        </InputAddon>
+      </Group>
       <Button
         w="full"
         maxW="calc(var(--thick-square-size) * 4)"
@@ -46,12 +72,19 @@ export function GameModesForm() {
       <Button
         w="full"
         maxW="calc(var(--thick-square-size) * 4)"
-        disabled={username.length === 0}
-        loading={phase === GAME_PHASES.MATCHING}
-        loadingText="Searching for opponent"
+        disabled={username.length === 0 || !isOnline}
+        loading={
+          phase === GAME_PHASES.MATCHING || multiplayerState === "too-long"
+        }
+        loadingText={
+          multiplayerState === "too-long"
+            ? "Connecting to server"
+            : "Searching for opponent"
+        }
         onClick={() => startMultiplayer(username)}
       >
-        Multiplayer
+        {isOnline && "Multiplayer"}
+        {!isOnline && "Multiplayer unavailable"}
       </Button>
       <Presence
         present={phase === GAME_PHASES.MATCHING}

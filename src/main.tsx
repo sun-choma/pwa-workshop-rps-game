@@ -12,12 +12,12 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <InstallableProvider>
       <WorkerProvider>
-        <GameProvider>
-          <Provider>
+        <Provider>
+          <GameProvider>
             <App />
-            <Toaster />
-          </Provider>
-        </GameProvider>
+          </GameProvider>
+          <Toaster />
+        </Provider>
       </WorkerProvider>
     </InstallableProvider>
   </StrictMode>,

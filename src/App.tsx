@@ -8,8 +8,8 @@ import { GameModesForm } from "@/components/game-modes-form";
 import { OpponentDesk } from "@/components/opponent-desk";
 import { Status } from "@/components/status";
 import { PlayerDesk } from "@/components/player-desk";
+import { ActionsHeader } from "@/components/actions-header";
 import { GAME_PHASES } from "@/core/game/constants";
-import { Overlay } from "@/components/overlay/overlay";
 
 const MENU_PHASES = [GAME_PHASES.INIT, GAME_PHASES.MATCHING];
 
@@ -21,15 +21,15 @@ function App() {
   } = useGame();
   const isMenuPhase = MENU_PHASES.includes(phase);
 
-  // const { isInstallable } = useInstallable();
-  // const { isInstalled } = usePwa();
-
   return (
     <>
-      <Overlay />
       <Grid
         templateColumns="repeat(auto-fill, calc(var(--thick-square-size) * 1))"
         templateRows="repeat(auto-fill, var(--thick-square-size))"
+        padding={{
+          md: "calc(var(--thick-square-size) * 0.25)",
+          base: "0.25rem",
+        }}
         w="full"
         h="full"
         justifyContent="center"
@@ -37,6 +37,7 @@ function App() {
         alignContent="center"
       >
         <VStack
+          position="relative"
           justifyContent="space-between"
           gridColumn="1 / -1"
           gridRow="1 / -1"
@@ -48,6 +49,7 @@ function App() {
         >
           {isMenuPhase && (
             <>
+              <ActionsHeader />
               <TechHeader />
               <GameTitle />
               <GameModesForm />

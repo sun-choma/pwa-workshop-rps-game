@@ -9,6 +9,7 @@ import {
 } from "@/core/game/constants.ts";
 
 export const Context = createContext<GameContext>({
+  multiplayerState: "waiting",
   game: {
     phase: GAME_PHASES.INIT,
     remainingTime: TURN_TIME,
@@ -20,6 +21,7 @@ export const Context = createContext<GameContext>({
     card: CARD_ATTRIBUTES.NONE,
     lives: MAX_LIVES,
     rematchDecision: null,
+    selectedCardIndex: null,
   },
   opponent: {
     name: "Player 2",
@@ -36,6 +38,7 @@ export const Context = createContext<GameContext>({
   hoverCard: () => {},
   clickCard: () => {},
   selectCard: () => {},
+  chooseRandom: () => {},
   rematch: () => {},
   returnToMenu: () => {},
 });

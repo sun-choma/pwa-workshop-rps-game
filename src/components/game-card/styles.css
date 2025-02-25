@@ -5,10 +5,10 @@
   perspective: 32rem;
   padding: 0;
 
-  animation: slide-in 300ms ease-out forwards;
-  animation-delay: calc(var(--index) * 80ms);
+  animation: slide-in 400ms ease-out forwards;
+  animation-delay: calc(var(--index) * 100ms);
   opacity: 0;
-  transform: translate(calc((var(--index) - 1) * 3rem), calc(-100% * var(--direction))) scale(1.25);
+  transform: translate(calc((var(--index) - 1) * -10rem), calc(-200% * var(--direction))) scale(1.25);
 
   --index: 0;
   --direction: -1;

@@ -115,19 +115,10 @@ export function getRandomEmoji() {
   return String.fromCodePoint(randomCodePoint);
 }
 
-// function debounce<Func extends (...args: unknown[]) => void>(
-//   func: Func,
-//   delay: number,
-// ): (...args: Parameters<Func>) => void {
-//   let timeout: ReturnType<typeof requestTimeout> | undefined;
-//
-//   return function (...args: Parameters<Func>) {
-//     if (timeout?.animationFrameId) {
-//       cancelTimeout(timeout);
-//     }
-//
-//     timeout = requestTimeout(() => {
-//       func(...args);
-//     }, delay);
-//   };
-// }
+export function msToObject(ms: number) {
+  const seconds = Math.floor((ms / 1000) % 60);
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const hours = Math.floor(ms / (1000 * 60 * 60));
+
+  return { seconds, minutes, hours };
+}

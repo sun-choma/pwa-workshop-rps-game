@@ -5,7 +5,6 @@ import { Context } from "@/providers/installable/context.ts";
 import type { BeforeInstallPromptEvent } from "@/types/window.ts";
 import { usePwa } from "@/hooks/usePwa.ts";
 
-// Practically determine appropriate value
 const TIMEOUT_MS = 5000;
 
 export function InstallableProvider({ children }: { children: ReactNode }) {
