@@ -14,6 +14,7 @@ import type * as Game from "@/core/game/types";
 import { cancelTimeout, requestTimeout } from "@/utils/common";
 import { GameContext } from "@/providers/game/types";
 import { offsetRandom } from "@/utils/math";
+import { ENV } from "@/env/config";
 
 const STATUS_TOAST_ID = String(Symbol("STATUS_TOAST_ID"));
 
@@ -34,7 +35,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       () => setMultiplayerState("too-long"),
       SERVER_WAIT_TIME,
     );
-    fetch("/api/ping").then(() => {
+    fetch(`${ENV.API_URL}/ping`).then(() => {
       cancelTimeout(serverAsleepTimeout);
       setMultiplayerState("ready");
     });

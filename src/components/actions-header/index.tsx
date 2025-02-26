@@ -33,7 +33,7 @@ export function ActionsHeader() {
   const [isOpen, setOpen] = useState(false);
 
   const { isInstallable, event } = useInstallable();
-  const { stats: response, isLoading } = useStats(isOpen);
+  const { stats: response, isLoading, error } = useStats(isOpen);
   const stats = response?.payload;
 
   const today = new Date().toLocaleDateString("en-CA").split("-").join("/");
@@ -88,6 +88,18 @@ export function ActionsHeader() {
           </DialogHeader>
           <DialogBody mx="auto">
             {isLoading && <Spinner size="xl" />}
+            {!isLoading && error !== undefined && (
+              <AlertRoot status="error" marginTop="0.5rem">
+                <AlertIndicator />
+                <AlertContent>
+                  <AlertTitle>Statistics Unavailable</AlertTitle>
+                  <AlertContent>
+                    We encountered a problem accessing the statistics. Ensure
+                    your network connection is active and attempt again.
+                  </AlertContent>
+                </AlertContent>
+              </AlertRoot>
+            )}
             {!isLoading && stats === null && (
               <Text>No statistics recorded for today yet</Text>
             )}

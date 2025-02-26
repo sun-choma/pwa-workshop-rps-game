@@ -3,8 +3,6 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 
-// import { ENV } from "./src/env/config";
-
 // https://vite.dev/config/
 export default defineConfig({
   root: "./",
@@ -12,11 +10,11 @@ export default defineConfig({
     outDir: "./build",
     emptyOutDir: true,
   },
-  base: "/pwa-workshop-rps/",
+  base: "/pwa-workshop-rps-game/",
   server: {
     proxy: {
-      "/api": {
-        target: `https://pwa-workshop-rps-server.glitch.me`,
+      "https://pwa-workshop-rps-server.glitch.me": {
+        target: `http://localhost:3000`,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
@@ -31,6 +29,9 @@ export default defineConfig({
       srcDir: "src",
       filename: "sw.ts",
       injectRegister: false,
+      injectManifest: {
+        globPatterns: ["**/*.{js,css,html,svg,woff2}"],
+      },
       devOptions: {
         enabled: true,
         type: "module",
@@ -42,60 +43,60 @@ export default defineConfig({
           "A modern Rock-Paper-Scissors game designed to teach frontend developers core PWA principles. Features a robust event-driven architecture and online play using WebSockets.",
         icons: [
           {
-            src: `/pwa-workshop-rps/logo/rps-logo.svg`,
+            src: `/pwa-workshop-rps-game/logo/rps-logo.svg`,
             sizes: "144x144",
             type: "image/svg+xml",
           },
         ],
-        start_url: "/",
+        start_url: "/pwa-workshop-rps-game",
         display: "standalone",
         theme_color: "#BD34FE",
         background_color: "#242424",
         screenshots: [
           {
-            src: `/pwa-workshop-rps/screenshots/mobile/main-menu.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/mobile/main-menu.jpg`,
             sizes: "390x844",
             type: "image/jpeg",
             form_factor: "narrow",
           },
           {
-            src: `/pwa-workshop-rps/screenshots/mobile/game-turn.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/mobile/game-turn.jpg`,
             sizes: "390x844",
             type: "image/jpeg",
             form_factor: "narrow",
           },
           {
-            src: `/pwa-workshop-rps/screenshots/mobile/game-finished.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/mobile/game-finished.jpg`,
             sizes: "390x844",
             type: "image/jpeg",
             form_factor: "narrow",
           },
           {
-            src: `/pwa-workshop-rps/screenshots/mobile/splash-screen.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/mobile/splash-screen.jpg`,
             sizes: "390x844",
             type: "image/jpeg",
             form_factor: "narrow",
           },
           {
-            src: `/pwa-workshop-rps/screenshots/desktop/main-menu.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/desktop/main-menu.jpg`,
             sizes: "1920x1080",
             type: "image/jpeg",
             form_factor: "wide",
           },
           {
-            src: `/pwa-workshop-rps/screenshots/desktop/game-turn.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/desktop/game-turn.jpg`,
             sizes: "1920x1080",
             type: "image/jpeg",
             form_factor: "wide",
           },
           {
-            src: `/pwa-workshop-rps/screenshots/desktop/game-finished.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/desktop/game-finished.jpg`,
             sizes: "1920x1080",
             type: "image/jpeg",
             form_factor: "wide",
           },
           {
-            src: `/pwa-workshop-rps/screenshots/desktop/splash-screen.jpg`,
+            src: `/pwa-workshop-rps-game/screenshots/desktop/splash-screen.jpg`,
             sizes: "1920x1080",
             type: "image/jpeg",
             form_factor: "wide",

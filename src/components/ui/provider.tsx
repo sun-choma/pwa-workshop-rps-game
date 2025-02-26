@@ -5,7 +5,7 @@ import { ColorModeProvider } from "@/components/ui/color-mode";
 export function Provider(props: ThemeProviderProps) {
   return (
     <ChakraProvider value={defaultSystem}>
-      <ColorModeProvider {...props} />
+      <ColorModeProvider {...props} defaultTheme="dark" />
     </ChakraProvider>
   );
 }

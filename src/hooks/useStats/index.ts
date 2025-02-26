@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { StatsResponse } from "@/hooks/useStats/types";
 import type { ApiResponse } from "@/types/common";
+import { ENV } from "@/env/config";
 
 export function useStats(shouldRefresh?: boolean) {
   const [stats, setStats] = useState<ApiResponse<StatsResponse | null>>();
@@ -13,8 +14,9 @@ export function useStats(shouldRefresh?: boolean) {
   useEffect(() => {
     if (shouldRefresh) {
       setLoading(true);
+      setError(undefined);
       controller.current = new AbortController();
-      fetch(`/api/stats`, { signal: controller.current.signal })
+      fetch(`${ENV.API_URL}/stats`, { signal: controller.current.signal })
         .then((res) =>
           res
             .json()
