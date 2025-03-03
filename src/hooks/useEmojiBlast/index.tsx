@@ -1,31 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { emojiBlast } from "emoji-blast";
 
 import { useGame } from "@/providers/game/useGame";
 import { OUTCOMES } from "@/core/game/constants";
+import { useDimensions } from "@/hooks/useDimensions";
 
 import { EMOJI_CONFIG_BASE, EMOJI_SETS } from "./constants";
 
 export function useEmojiBlast() {
-  const [dimensions, setDimensions] = useState<{
-    width: number;
-    height: number;
-  }>({ width: window.innerWidth, height: window.innerHeight });
+  const { dimensions } = useDimensions();
 
   const {
     game: { turnOutcome },
   } = useGame();
-
-  useEffect(() => {
-    const resizeHandler = () => {
-      setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    };
-    window.addEventListener("resize", resizeHandler);
-
-    return () => {
-      window.removeEventListener("resize", resizeHandler);
-    };
-  }, []);
 
   const emojiConfig = useMemo(() => {
     if (turnOutcome === OUTCOMES.DRAW) {

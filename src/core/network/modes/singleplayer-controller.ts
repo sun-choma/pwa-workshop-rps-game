@@ -44,11 +44,14 @@ export class SingleplayerController {
         this.messageBus.dispatch("turn-start");
         this.offlineTurn();
         break;
-      // case "turn-finished":
-      //   this.messageBus.dispatch("turn-finished");
-      //   break;
       case "attr-sent":
         this.messageBus.dispatch("attr-sent", selectRandomCard());
+        break;
+      case "send-emoji":
+        requestTimeout(
+          () => this.messageBus.dispatch("receive-emoji", getRandomEmoji()),
+          500,
+        );
         break;
       case "rematch-decision":
         if (payload === REMATCH_DECISIONS.REMATCH) {

@@ -8,4 +8,5 @@ export const SOCKET_EVENTS = [
   "rematch-decision",
   "opponent-left",
   "rematch",
+  "receive-emoji",
 ] as const;

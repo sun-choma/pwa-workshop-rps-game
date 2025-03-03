@@ -58,12 +58,8 @@
   transform: rotateY(180deg);
 }
 
-.card-container .card svg {
-  width: 48px;
-  height: 48px;
-}
 
-button:hover:not(:disabled) > .card-container:not(.selected) .card,
+.card-container:not(.selected) .card:hover:has(button.card-front:not(:disabled)),
 .card-container.hovered .card {
   transform: translateY(calc(20% * var(--direction)));
 }

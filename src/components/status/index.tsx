@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { ArrowLeftFromLineIcon, DicesIcon } from "lucide-react";
 import {
   VStack,
   Text,
@@ -9,7 +8,6 @@ import {
   Presence,
   useBreakpointValue,
   Flex,
-  IconButton,
 } from "@chakra-ui/react";
 
 import { GAME_PHASES, REMATCH_DECISIONS } from "@/core/game/constants";
@@ -18,20 +16,23 @@ import { ProgressCircle } from "@/components/progress-circle";
 import { Button } from "@/components/ui/button";
 import { useEmojiBlast } from "@/hooks/useEmojiBlast";
 
-import { DecisionContainer } from "./decision-container";
 import {
   GAME_RESULT_LABELS,
   PHASE_MAX_TIME,
   TIMER_PHASES,
   TURN_RESULT_LABELS,
 } from "./constants";
+import { EmojiSelector } from "./emoji-selector";
+import { RandomizerButton } from "./randomizer-button";
+import { DecisionContainer } from "./decision-container";
+import { BackButton } from "./back-button";
+import { SkipTurnButton } from "./skip-turn-button";
 
 export function Status() {
   const {
     game: { remainingTime, phase, turnOutcome },
     player,
     rematch,
-    chooseRandom,
     returnToMenu,
   } = useGame();
   const { blast } = useEmojiBlast();
@@ -50,12 +51,16 @@ export function Status() {
   const turnPercent = ((maxTime - (time || 0)) / maxTime) * 100;
 
   const haveFinishedPreemptively =
-    !!player.card && phase === GAME_PHASES.PLAYERS_TURN && time > 0;
+    player.card !== null && phase === GAME_PHASES.PLAYERS_TURN && time > 0;
   const isTimeout = time === 0;
 
-  useEffect(() => {
-    if (phase === GAME_PHASES.GAME_RESULTS) blast();
-  }, [phase, turnOutcome]);
+  useEffect(
+    () => {
+      if (phase === GAME_PHASES.GAME_RESULTS) blast();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [phase, turnOutcome],
+  );
 
   return (
     TIMER_PHASES.includes(phase) && (
@@ -87,25 +92,8 @@ export function Status() {
             </Presence>
           </Box>
           <HStack gap="0">
-            <Presence
-              present={phase === GAME_PHASES.PLAYERS_TURN}
-              animationStyle={{
-                _open: "scale-fade-in",
-                _closed: "scale-fade-out",
-              }}
-              animationDuration="moderate"
-              lazyMount
-              unmountOnExit
-            >
-              <IconButton
-                variant="plain"
-                w="calc(var(--thin-square-size) * 3)"
-                h="calc(var(--thin-square-size) * 3)"
-                onClick={returnToMenu}
-              >
-                <ArrowLeftFromLineIcon />
-              </IconButton>
-            </Presence>
+            <BackButton />
+            <SkipTurnButton />
             <Flex
               w="var(--thick-square-size)"
               h="var(--thick-square-size)"
@@ -121,26 +109,8 @@ export function Status() {
                   GAME_RESULT_LABELS[player.lives ? "WIN" : "LOSE"]}
               </ProgressCircle>
             </Flex>
-            <Presence
-              present={phase === GAME_PHASES.PLAYERS_TURN}
-              animationStyle={{
-                _open: "scale-fade-in",
-                _closed: "scale-fade-out",
-              }}
-              animationDuration="moderate"
-              lazyMount
-              unmountOnExit
-            >
-              <IconButton
-                variant="plain"
-                w="calc(var(--thin-square-size) * 3)"
-                h="calc(var(--thin-square-size) * 3)"
-                onClick={chooseRandom}
-                disabled={player.card !== null && player.card !== undefined}
-              >
-                <DicesIcon />
-              </IconButton>
-            </Presence>
+            <EmojiSelector />
+            <RandomizerButton />
           </HStack>
           <Box h="calc(var(--thin-square-size) * 3)">
             <Presence

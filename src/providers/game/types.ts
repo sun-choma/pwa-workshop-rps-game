@@ -14,6 +14,7 @@ interface Player {
   selectedCardIndex: number | null;
   hoveredCardIndex?: number | null;
   isReady?: boolean;
+  reactions?: string[];
 }
 
 export interface GameContext {
@@ -31,7 +32,9 @@ export interface GameContext {
   hoverCard: (cardIndex: number | null) => void;
   clickCard: (cardIndex: number | null) => void;
   selectCard: (attr: CARD_ATTRIBUTES) => void;
+  sendEmoji: (emoji: string) => void;
   chooseRandom: () => void;
   rematch: () => void;
   returnToMenu: () => void;
+  skipTurn: () => void;
 }

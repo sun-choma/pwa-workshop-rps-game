@@ -16,7 +16,8 @@ export default defineConfig({
       "https://pwa-workshop-rps-server.glitch.me": {
         target: `http://localhost:3000`,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) =>
+          path.replace(/^https:\/\/pwa-workshop-rps-server.glitch.me/, ""),
       },
     },
   },

@@ -9,12 +9,13 @@ import {
   SERVER_WAIT_TIME,
 } from "@/providers/game/constants";
 import { GameMaster } from "@/core/game/game-master";
-import { GAME_PHASES, OUTCOMES } from "@/core/game/constants";
+import { CARD_ATTRIBUTES, GAME_PHASES, OUTCOMES } from "@/core/game/constants";
 import type * as Game from "@/core/game/types";
 import { cancelTimeout, requestTimeout } from "@/utils/common";
 import { GameContext } from "@/providers/game/types";
 import { offsetRandom } from "@/utils/math";
 import { ENV } from "@/env/config";
+import { useReaction } from "@/hooks/useReaction";
 
 const STATUS_TOAST_ID = String(Symbol("STATUS_TOAST_ID"));
 
@@ -47,7 +48,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [playerName, setPlayerName] = useState<Game.Value<"playerName">>("");
   const [playerLives, setPlayerLives] =
     useState<Game.Value<"playerLives">>(MAX_LIVES);
-  const [playerCard, setPlayerCard] = useState<Game.Value<"playerCard">>();
+  const [playerCard, setPlayerCard] = useState<Game.Value<"playerCard">>(null);
   const [playerCardIndex, setPlayerCardIndex] =
     useState<Game.Value<"playerSelectedIndex">>(null);
   const [playerDecision, setPlayerDecision] =
@@ -67,6 +68,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     useState<Game.Value<"opponentReady">>(false);
   const [opponentDecision, setOpponentDecision] =
     useState<Game.Value<"opponentRematchDecision">>(null);
+  const { emoji: opponentReactions, addReaction: addOpponentReaction } =
+    useReaction();
 
   const notifyOpponentLeft = useCallback(() => {
     const endGame = () => {
@@ -106,20 +109,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
       "opponent-card-change": setOpponentCard,
       "opponent-ready-change": setOpponentTurnEnd,
       "opponent-rematch-set": setOpponentDecision,
+      "receive-emoji": addOpponentReaction,
     };
 
-    gameMasterRef?.current.addEventListeners(subscriptions);
-    gameMasterRef?.current.addEventListener(
-      "opponent-left",
-      notifyOpponentLeft,
-    );
+    gameMasterRef.current.addEventListeners(subscriptions);
+    gameMasterRef.current.addEventListener("opponent-left", notifyOpponentLeft);
 
     const ref = gameMasterRef.current;
     return () => {
       ref.removeEventListeners(subscriptions);
       ref.removeEventListener("opponent-left", notifyOpponentLeft);
     };
-  }, [gameMasterRef, notifyOpponentLeft]);
+  }, [addOpponentReaction, gameMasterRef, notifyOpponentLeft]);
 
   const chooseRandom = useCallback(() => {
     let randomIndex = offsetRandom(0, 2);
@@ -132,6 +133,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
     toaster.dismiss(STATUS_TOAST_ID);
     gameMasterRef.current.actions.gameEnd.returnToMenu();
   }, []);
+
+  const skipTurn = useCallback(
+    () => gameMasterRef.current.actions.match.confirmCard(CARD_ATTRIBUTES.NONE),
+    [],
+  );
 
   const contextValue = {
     game: {
@@ -156,6 +162,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       selectedCardIndex: opponentSelectionIndex,
       isReady: isOpponentTurnEnded,
       rematchDecision: opponentDecision,
+      reactions: opponentReactions,
     },
     multiplayerState,
     startMultiplayer: gameMasterRef.current.actions.common.startMultiplayer,
@@ -164,6 +171,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     hoverCard: gameMasterRef.current.actions.match.highlightCard,
     clickCard: gameMasterRef.current.actions.match.selectCard,
     selectCard: gameMasterRef.current.actions.match.confirmCard,
+    skipTurn,
+    sendEmoji: gameMasterRef.current.actions.match.sendEmoji,
     chooseRandom,
     rematch: gameMasterRef.current.actions.gameEnd.rematch,
     returnToMenu,

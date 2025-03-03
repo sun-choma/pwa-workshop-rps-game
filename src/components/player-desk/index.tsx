@@ -1,7 +1,8 @@
-import { CSSProperties, useMemo } from "react";
-import { Flex } from "@chakra-ui/react";
+import { useMemo } from "react";
+import { Flex, HStack, IconButton, Text, VStack } from "@chakra-ui/react";
+import { CheckIcon, XIcon } from "lucide-react";
 
-import { GameCard } from "@/components/game-card";
+import { CardBack, CardFront, GameCard } from "@/components/game-card";
 import { useGame } from "@/providers/game/useGame";
 import { Button } from "@/components/ui/button";
 import { Desk } from "@/components/desk";
@@ -25,13 +26,16 @@ export function PlayerDesk() {
   const isTurnPhase = phase === GAME_PHASES.PLAYERS_TURN;
   const timeStillLeft = Number(remainingTime) > 0;
 
-  const canSelectCard = isTurnPhase && !player.card && timeStillLeft;
+  const canSelectCard = isTurnPhase && player.card === null && timeStillLeft;
 
-  const randomCards = useMemo(() => shuffle(PLAYER_CARDS), [phase]);
+  const randomCards = useMemo(
+    () => shuffle(PLAYER_CARDS),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [phase],
+  );
 
-  const handleCardClick = (attr: CARD_ATTRIBUTES, index: number) => {
-    if (randomCards[player.selectedCardIndex ?? -1] === attr) selectCard(attr);
-    else clickCard(index);
+  const handleCardClick = (index: number | null) => {
+    clickCard(index);
     hoverCard(null);
   };
 
@@ -45,32 +49,49 @@ export function PlayerDesk() {
       >
         {isTurnPhase &&
           randomCards.map((card, index) => (
-            <Button
+            <GameCard
               key={card}
-              variant="plain"
-              w="full"
-              h="full"
-              transformOrigin="center"
-              padding={0}
-              disabled={!canSelectCard}
-              onClick={() => handleCardClick(card, index)}
+              index={index}
+              isRotated={index === player.selectedCardIndex}
               onMouseOver={() => timeStillLeft && hoverCard(index)}
               onMouseLeave={() => timeStillLeft && hoverCard(null)}
             >
-              <GameCard
-                attr={card}
-                isSelected={index === player.selectedCardIndex}
-                style={{ "--index": index, "--direction": -1 } as CSSProperties}
-              />
-            </Button>
+              <CardFront
+                as={Button}
+                color="white"
+                disabled={!canSelectCard}
+                onClick={() => handleCardClick(index)}
+              >
+                {card}
+              </CardFront>
+              <CardBack as={VStack}>
+                {canSelectCard && (
+                  <>
+                    <Text fontSize="2xl">🤔</Text>
+                    <HStack>
+                      <IconButton
+                        variant="outline"
+                        onClick={() => selectCard(card)}
+                      >
+                        <CheckIcon strokeWidth={1} size={32} />
+                      </IconButton>
+                      <IconButton
+                        variant="outline"
+                        onClick={() => handleCardClick(null)}
+                      >
+                        <XIcon strokeWidth={1} size={32} />
+                      </IconButton>
+                    </HStack>
+                  </>
+                )}
+                {!canSelectCard && <CheckIcon strokeWidth={1} size={48} />}
+              </CardBack>
+            </GameCard>
           ))}
         {!isTurnPhase && (
-          <GameCard
-            key="card"
-            attr={player.card}
-            style={{ "--index": 1, "--direction": -1 } as CSSProperties}
-            mx="auto"
-          />
+          <GameCard key="card" index={1} mx="auto">
+            <CardFront>{player.card}</CardFront>
+          </GameCard>
         )}
       </Flex>
     </Desk>

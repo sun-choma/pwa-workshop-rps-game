@@ -18,7 +18,9 @@ export function Desk({ title, lives, children, ...props }: DeskProps) {
   return (
     <VStack className="card-desk" {...props}>
       <HStack className="player-info">
-        <Text lineClamp={1}>{title}</Text>
+        <Text lineClamp={1} textAlign="left">
+          {title}
+        </Text>
         <HStack>
           {nodeArray({
             item: (index) => <HeartOffIcon key={index} />,

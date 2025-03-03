@@ -8,6 +8,7 @@ export interface SendPayloadMap {
   "select-card": [cardIndex: number | null];
   "attr-sent": [attr: CardAttribute];
   "rematch-decision": [decision: RematchDecision];
+  "send-emoji": [emoji: string];
 }
 
 export interface MessagePayloadMap {
@@ -20,4 +21,5 @@ export interface MessagePayloadMap {
   "rematch-decision": [decision: RematchDecision];
   "opponent-left": null;
   rematch: null;
+  "receive-emoji": [emoji: string];
 }

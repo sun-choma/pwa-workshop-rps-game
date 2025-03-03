@@ -99,6 +99,9 @@ export class GameMaster {
         this.session.send("turn-finished");
         this.gameFlow.proceedIfBothReady();
       },
+      sendEmoji: (emoji: string) => {
+        this.session.send("send-emoji", emoji);
+      },
     },
     gameEnd: {
       rematch: () => {

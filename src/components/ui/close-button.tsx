@@ -1,6 +1,6 @@
-import * as React from "react";
 import type { ButtonProps } from "@chakra-ui/react";
 import { IconButton as ChakraIconButton } from "@chakra-ui/react";
+import * as React from "react";
 import { XIcon } from "lucide-react";
 
 export type CloseButtonProps = ButtonProps;
