@@ -25,6 +25,10 @@
   --thin-square-size: calc(var(--thick-square-size) / var(--thin-square-count));
 }
 
+html {
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   display: flex;
