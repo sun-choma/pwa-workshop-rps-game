@@ -73,14 +73,14 @@ export function ActionsHeader() {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Today's highlights</DialogTitle>
-            <Text>Past games statistics for {today}</Text>
+            <DialogTitle>Today's Highlights</DialogTitle>
+            <Text>Game statistics for {today}</Text>
             {response?.meta?.isCached && (
               <AlertRoot status="warning" marginTop="0.5rem">
                 <AlertIndicator />
                 <AlertContent>
                   <AlertTitle>
-                    Response served from cache. It may be outdated
+                    Response served from cache. It may be outdated.
                   </AlertTitle>
                 </AlertContent>
               </AlertRoot>
@@ -101,32 +101,33 @@ export function ActionsHeader() {
               </AlertRoot>
             )}
             {!isLoading && stats === null && (
-              <Text>No statistics recorded for today yet</Text>
+              <Text>No statistics recorded for today yet.</Text>
             )}
             {!isLoading && !!stats && (
               <ListRoot pl="1rem" gap="0.5rem">
                 <RowTitle label="Devoted Player">
                   <RowItem>
-                    Keep&nbsp;<b>{stats.player_with_most_matches.name}</b>
-                    &nbsp;away from gambling!
+                    <b>{stats.player_with_most_matches.name}</b>
+                    &nbsp;just can't get enough!
                   </RowItem>
                   <RowItem>
-                    He already participated in&nbsp;
-                    {stats.player_with_most_matches.count}&nbsp;games (and may
-                    still be going)
+                    Participated in&nbsp;
+                    {stats.player_with_most_matches.count}&nbsp;games today (and
+                    might still be playing)
                   </RowItem>
                 </RowTitle>
 
                 {stats.pair_with_most_rematches && (
-                  <RowTitle label="Arch Nemesis Showdown">
+                  <RowTitle label="Arch-Nemesis Showdown">
                     <RowItem>
+                      The battle between{" "}
                       <b>{stats.pair_with_most_rematches.players[0]}</b>
-                      &nbsp;vs.&nbsp;
+                      &nbsp;and&nbsp;
                       <b>{stats.pair_with_most_rematches.players[1]}</b>
-                      &nbsp;battle was legendary
+                      &nbsp;was legendary!
                     </RowItem>
                     <RowItem>
-                      It took total of {stats.pair_with_most_rematches.count}
+                      It took a total of {stats.pair_with_most_rematches.count}
                       &nbsp;games
                     </RowItem>
                   </RowTitle>
@@ -147,11 +148,11 @@ export function ActionsHeader() {
                   <RowTitle label="Flawless Victory">
                     <RowItem>
                       <b>{stats.player_with_most_perfect_victories.name}</b>
-                      &nbsp;reads his opponents like an open book
+                      &nbsp;reads opponents like an open book
                     </RowItem>
                     <RowItem>
-                      Despite the 10% probability he managed to pull it
-                      off&nbsp;
+                      Despite the 10% probability, this player managed to pull
+                      it off&nbsp;
                       {stats.player_with_most_perfect_victories.count}
                       &nbsp;times
                     </RowItem>
@@ -160,13 +161,13 @@ export function ActionsHeader() {
 
                 <RowTitle label="Marathon Runners">
                   <RowItem>
-                    I envy&nbsp;<b>{stats.longest_match.by_time.players[0]}</b>
+                    <b>{stats.longest_match.by_time.players[0]}</b>
                     &nbsp;and&nbsp;
                     <b>{stats.longest_match.by_time.players[1]}</b>
-                    &nbsp;endurance
+                    &nbsp;showed incredible endurance
                   </RowItem>
                   <RowItem>
-                    That match lasted for&nbsp;
+                    Their match lasted for&nbsp;
                     {longestTimings.hours > 0 &&
                       `${longestTimings.hours} hours `}
                     {longestTimings.minutes > 0 &&
@@ -180,16 +181,16 @@ export function ActionsHeader() {
                   <RowItem>
                     <b>{stats.longest_match.by_turns.players[0]}</b>
                     &nbsp;and&nbsp;
-                    <b>{stats.longest_match.by_turns.players[1]}</b>&nbsp;are
-                    playing on a whole different level
+                    <b>{stats.longest_match.by_turns.players[1]}</b>&nbsp;
+                    showed exceptional strategic depth
                   </RowItem>
                   <RowItem>
-                    It took {stats.longest_match.by_turns.turns} turns to finish
-                    the game
+                    Their game lasted an incredible{" "}
+                    {stats.longest_match.by_turns.turns} turns
                   </RowItem>
                 </RowTitle>
 
-                <RowTitle label="Lightning fast">
+                <RowTitle label="Lightning Fast">
                   <RowItem>
                     Sonic is no match for&nbsp;
                     <b>{stats.shortest_match.by_time.players[0]}</b>
@@ -197,7 +198,7 @@ export function ActionsHeader() {
                     <b>{stats.shortest_match.by_time.players[1]}</b>
                   </RowItem>
                   <RowItem>
-                    That match ended in mere&nbsp;
+                    The match concluded in just&nbsp;
                     {(stats.shortest_match.by_time.ms / 1000).toFixed(1)}{" "}
                     seconds
                   </RowItem>
@@ -209,7 +210,7 @@ export function ActionsHeader() {
                     inevitable
                   </RowItem>
                   <RowItem>
-                    It took him {stats.shortest_match.by_turns.turns} turns and
+                    It took just {stats.shortest_match.by_turns.turns} turns and
                     a snap of fingers to win the game
                   </RowItem>
                 </RowTitle>
