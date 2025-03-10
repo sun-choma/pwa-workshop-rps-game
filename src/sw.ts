@@ -18,7 +18,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 setDefaultHandler(new NetworkOnly());
 
 registerRoute(
-  /.*api\/stats(?:\?.*)?$/,
+  /.*\/stats(?:\?.*)?$/,
   new NetworkFirst({
     cacheName: "stats-cache",
     plugins: [
