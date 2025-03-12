@@ -26,19 +26,10 @@
   transform: translate(-50%, -50%) rotate(-45deg);
 }
 
-.sunbear,
 .react,
 .vite {
   transition: filter .3s;
   user-select: none;
-}
-
-.sunbear {
-  filter: drop-shadow(0 0 1rem #f20f2077);
-}
-
-.sunbear:hover {
-  filter: drop-shadow(0 0 1.5rem #f20f20);
 }
 
 .react {

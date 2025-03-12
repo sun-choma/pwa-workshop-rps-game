@@ -33,10 +33,9 @@ export function Overlay({ multiplayerState, children }: OverlayProps) {
         >
           <div className="logo-container">
             <svg
-              width="96px"
-              height="96px"
-              viewBox="0 0 208 208"
-              preserveAspectRatio="xMidYMid meet"
+              width="150px"
+              height="58px"
+              viewBox="0 0 512 190"
               className={joinClassNames(
                 "logo",
                 multiplayerState === "too-long" &&
@@ -44,8 +43,7 @@ export function Overlay({ multiplayerState, children }: OverlayProps) {
                   "animated",
               )}
             >
-              <circle cx="50%" cy="50%" r="50%" fill="#fff" />
-              <use x="12px" y="12px" xlinkHref="logo/sunbear.svg#icon" />
+              <use xlinkHref="logo/pwa-logo.svg#icon" />
             </svg>
           </div>
           <div className="details-container">
@@ -59,7 +57,7 @@ export function Overlay({ multiplayerState, children }: OverlayProps) {
               lazyMount
               unmountOnExit
             >
-              Make awesome things that matter.
+              Progressive Web Applications
             </Presence>
             <Presence
               className="small"
